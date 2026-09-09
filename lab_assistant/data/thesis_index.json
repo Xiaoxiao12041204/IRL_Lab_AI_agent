@@ -1,0 +1,735 @@
+[
+  {
+    "author": "王永成",
+    "english_author": "Yung-Cheng Wang",
+    "title": "物聯網行動裝置之邊緣運算與傳輸節能方法",
+    "english_title": "An Energy-Saving Method of Edge Computing and Transmission in IoT Mobile Device",
+    "advisor": "郭文興",
+    "year_roc": 108,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/王永成/",
+    "keywords": [
+      "物聯網",
+      "行動裝置",
+      "邊緣運算",
+      "節能",
+      "資料處理耗能",
+      "資料傳輸耗能",
+      "Zlib",
+      "LZMA",
+      "PNG壓縮",
+      "人臉辨識",
+      "Raspberry Pi",
+      "數學權衡模型"
+    ]
+  },
+  {
+    "author": "賴宏銘",
+    "english_author": "Hong-Ming Lai",
+    "title": "基於物聯網之邊緣運算閘道研究與實作",
+    "english_title": "Research and Implementation of Edge Computing Gateway Based on Internet of Things",
+    "advisor": "郭文興",
+    "year_roc": 108,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/賴宏銘/",
+    "keywords": [
+      "物聯網",
+      "邊緣運算",
+      "閘道",
+      "Gateway",
+      "WSO2",
+      "節能",
+      "邊緣運算閘道"
+    ]
+  },
+  {
+    "author": "郭家騏",
+    "english_author": "Chia-Chi Kuo",
+    "title": "物聯網無人載具之通訊系統實作",
+    "english_title": "Implementation of Communications Systems for IoT unmanned vehicles",
+    "advisor": "郭文興",
+    "year_roc": 109,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/郭家騏/",
+    "keywords": [
+      "物聯網",
+      "無人載具",
+      "無人機",
+      "UAV",
+      "通訊系統",
+      "通訊協定"
+    ]
+  },
+  {
+    "author": "顏伯丞",
+    "english_author": "Po-Cheng Yen",
+    "title": "物聯網之邊緣運算的物件辨識實作",
+    "english_title": "Implementation of Object Recognition with Edge Computing in IoT",
+    "advisor": "郭文興",
+    "year_roc": 109,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/顏伯丞/",
+    "keywords": [
+      "物聯網",
+      "邊緣運算",
+      "物件辨識",
+      "AI影像辨識",
+      "深度學習",
+      "影像處理"
+    ]
+  },
+  {
+    "author": "趙煒",
+    "english_author": "Wei Jhao",
+    "title": "Massive MIMO無線回程網路的路由及天線分配研究",
+    "english_title": "Routing and Antenna Allocation in Massive MIMO Wireless Backhaul Networks",
+    "advisor": "郭文興",
+    "year_roc": 109,
+    "month_roc": 12,
+    "nas_path": "/IRLshare/畢業論文/趙煒/",
+    "keywords": [
+      "Massive MIMO",
+      "無線回程網路",
+      "路由",
+      "天線分配",
+      "Backhaul",
+      "5G"
+    ]
+  },
+  {
+    "author": "唐嘉鋒",
+    "english_author": "Ka-Fung Tong",
+    "title": "物聯網閘道與社群平台之整合介接實作",
+    "english_title": "Implementation of Application Programming Interface(API) between IoT Gateway and Instant Messaging Applications",
+    "advisor": "郭文興",
+    "year_roc": 111,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/唐嘉鋒/",
+    "keywords": [
+      "物聯網閘道",
+      "社群平台",
+      "LINE",
+      "Webhook",
+      "API介接",
+      "Cloud App",
+      "雲端資料庫",
+      "Binder"
+    ]
+  },
+  {
+    "author": "林威諭",
+    "english_author": "Wei-Yu Lin",
+    "title": "無線環境中自動化多基站資源分配機制",
+    "english_title": "Automated Multi-Base Station Resource Allocation Scheme in Wireless Environments",
+    "advisor": "郭文興",
+    "year_roc": 111,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/林威諭/",
+    "keywords": [
+      "多基站",
+      "資源分配",
+      "無線環境",
+      "頻率指配",
+      "基地台",
+      "自動化指配"
+    ]
+  },
+  {
+    "author": "向禮勤",
+    "english_author": "Li-Qin Xiang",
+    "title": "多蜂巢網路架構下包含視角預測之虛擬實境使用者",
+    "english_title": "Virtual Reality Users with Viewport Prediction in Multi-Cell Network Architecture",
+    "advisor": "郭文興",
+    "year_roc": 113,
+    "month_roc": 6,
+    "nas_path": "/IRLshare/畢業論文/向禮勤/",
+    "keywords": [
+      "多蜂巢網路",
+      "視角預測",
+      "VR",
+      "虛擬實境",
+      "5G Massive MIMO",
+      "AIOT",
+      "視角串流"
+    ]
+  },
+  {
+    "author": "謝甫",
+    "english_author": "Fu Hsieh",
+    "title": "資源分配與核對排程系統開發",
+    "english_title": "Development of Resource Allocation and Check-Sheet Scheduling System",
+    "advisor": "郭文興",
+    "year_roc": 113,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/謝甫/",
+    "keywords": [
+      "資源分配",
+      "排程系統",
+      "check-sheet",
+      "系統開發",
+      "叫號機",
+      "行事曆"
+    ]
+  },
+  {
+    "author": "邱子倫",
+    "english_author": "Tzu-Lun Chiu",
+    "title": "基於有限狀態機之多人互動應用系統設計與實作",
+    "english_title": "Design and Implementation of Multi-User Interactive Application System Based on Finite State Machine",
+    "advisor": "郭文興",
+    "year_roc": 114,
+    "month_roc": 6,
+    "nas_path": "/IRLshare/畢業論文/邱子倫/",
+    "keywords": [
+      "有限狀態機",
+      "FSM",
+      "多人互動",
+      "狼人殺",
+      "遊戲架構",
+      "狀態同步",
+      "Socket"
+    ]
+  },
+  {
+    "author": "鍾嘉祐",
+    "english_author": "Chia-Yu Chung",
+    "title": "地理圖資結合大型語言模型應用",
+    "english_title": "Applications of Large Language Models Integrated with Geospatial Data",
+    "advisor": "郭文興",
+    "year_roc": 115,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/鍾嘉祐/",
+    "keywords": [
+      "大型語言模型",
+      "LLM",
+      "地理圖資",
+      "GIS",
+      "RAG",
+      "空間對話",
+      "OpenStreetMap",
+      "向量資料庫",
+      "路徑規劃"
+    ]
+  },
+  {
+    "author": "施學廷",
+    "english_author": "Hsueh-Ting Shih",
+    "title": "物聯網可客製化微處理器代碼產生系統之設計與實作",
+    "english_title": "Design and Implementation of Customizable Microprocessor Code Generation System for IoT",
+    "advisor": "郭文興",
+    "year_roc": 107,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/施學廷/",
+    "keywords": [
+      "物聯網",
+      "微處理器",
+      "代碼產生系統",
+      "代碼自動生成",
+      "可客製化",
+      "韌體開發"
+    ]
+  },
+  {
+    "author": "施宏翰",
+    "english_author": "Hung-Han Shih",
+    "title": "有限資訊下的室內基地台位置計算方法及其效能評估",
+    "english_title": "Indoor Base Station Localization and Performance Evaluation with Limited Information",
+    "advisor": "郭文興",
+    "year_roc": 104,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/施宏翰/",
+    "keywords": [
+      "室內基地台",
+      "基地台定位",
+      "離心方向法",
+      "CD",
+      "多維度標度法",
+      "MDS",
+      "IAP",
+      "有限資訊"
+    ]
+  },
+  {
+    "author": "洪瑜翎",
+    "english_author": "Yu-Ling Hung",
+    "title": "物聯網中裝置自動化控管方法與相關閘道架構",
+    "english_title": "Automatic IoT Device Management Scheme and Relative Gateway Architecture",
+    "advisor": "郭文興",
+    "year_roc": 105,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/洪瑜翎/",
+    "keywords": [
+      "物聯網",
+      "裝置控管",
+      "自動化控管",
+      "閘道架構",
+      "Gateway",
+      "智慧家庭",
+      "屬性多重分類"
+    ]
+  },
+  {
+    "author": "呂亞洋",
+    "english_author": "Ya-Yang Lu",
+    "title": "數位家庭M2M閘道在裝置間自動管理應用的方法",
+    "english_title": "Automated Inter-Device Management Method in Digital Home M2M Gateway",
+    "advisor": "郭文興",
+    "year_roc": 104,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/呂亞洋/",
+    "keywords": [
+      "數位家庭",
+      "M2M",
+      "閘道",
+      "裝置自動管理",
+      "智慧家電"
+    ]
+  },
+  {
+    "author": "林詠軒",
+    "english_author": "Yung-Hsuan Lin",
+    "title": "一個在串流服務CDN上的高效率且節能的線上資源分配之方法",
+    "english_title": "An Efficient and Energy-Saving Online Resource Allocation Scheme in Streaming CDN",
+    "advisor": "郭文興",
+    "year_roc": 103,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/林詠軒/",
+    "keywords": [
+      "串流服務",
+      "CDN",
+      "節能",
+      "線上資源分配",
+      "網路優化",
+      "高效率"
+    ]
+  },
+  {
+    "author": "張哲瑋",
+    "english_author": "Che-Wei Chang",
+    "title": "智慧型射頻相關研究",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 100,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/張哲瑋/",
+    "keywords": [
+      "Che-Wei Chang",
+      "智慧型射頻",
+      "碩士論文",
+      "張哲瑋"
+    ]
+  },
+  {
+    "author": "童彥諴",
+    "english_author": "Yan-Shian Tung",
+    "title": "在車用網路中以RSU為基礎的車輛管理方式",
+    "english_title": "College of Engineering",
+    "advisor": "郭文興",
+    "year_roc": 100,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/童彥諴/",
+    "keywords": [
+      "童彥諴",
+      "車用網路",
+      "Yan-Shian Tung",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "楊舒智",
+    "english_author": "Shu-Chih Yang",
+    "title": "車用網路中以分段為基礎的分散式交通監控",
+    "english_title": "Yuan Ze University",
+    "advisor": "郭文興",
+    "year_roc": 100,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/楊舒智/",
+    "keywords": [
+      "楊舒智",
+      "車用網路",
+      "Shu-Chih Yang",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "陳奕燁",
+    "english_author": "Yi-Yeh Chen",
+    "title": "車用網路中低負載的訊息整合傳遞機制",
+    "english_title": "Yuan Ze University",
+    "advisor": "郭文興",
+    "year_roc": 101,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/陳奕燁/",
+    "keywords": [
+      "Yi-Yeh Chen",
+      "車用網路",
+      "陳奕燁",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "黃仁襄",
+    "english_author": "Jen-Hsiang Huang",
+    "title": "車用網路中基於費洛蒙的車對車(V2V)的路由方法",
+    "english_title": "College of Engineering",
+    "advisor": "郭文興",
+    "year_roc": 101,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/黃仁襄/",
+    "keywords": [
+      "黃仁襄",
+      "車用網路",
+      "碩士論文",
+      "Jen-Hsiang Huang"
+    ]
+  },
+  {
+    "author": "吳順雄",
+    "english_author": "Shun-Hsiung Wu",
+    "title": "LOA-CAST：車用網路中全新設計的低負載資訊廣播",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 101,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/吳順雄/",
+    "keywords": [
+      "車用網路",
+      "吳順雄",
+      "碩士論文",
+      "Shun-Hsiung Wu"
+    ]
+  },
+  {
+    "author": "董士奇",
+    "english_author": "Shiqi Dong",
+    "title": "VANET 相關研究（論文未上傳 NAS，無資料夾）",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 101,
+    "month_roc": 7,
+    "nas_path": "",
+    "keywords": [
+      "VANET",
+      "車用網路",
+      "董士奇",
+      "Shiqi Dong",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "林祺富",
+    "english_author": "Chi-Fu Lin",
+    "title": "智慧型射頻相關研究",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 101,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/林祺富/",
+    "keywords": [
+      "林祺富",
+      "Chi-Fu Lin",
+      "碩士論文",
+      "智慧型射頻"
+    ]
+  },
+  {
+    "author": "吳其鴻",
+    "english_author": "Chi-Hung Wu",
+    "title": "利用基因演算法的LTE 4G網路毫微蜂巢資源整合方法",
+    "english_title": "利用基因演算法的LTE 4G網路毫微蜂巢資源整合方法Genetic Algorithm-Based Cooperation Scheme For LTE 4G Femtocell",
+    "advisor": "郭文興",
+    "year_roc": 103,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/吳其鴻/",
+    "keywords": [
+      "吳其鴻",
+      "LTE",
+      "碩士論文",
+      "Chi-Hung Wu"
+    ]
+  },
+  {
+    "author": "林庭陽",
+    "english_author": "Ting-Yang Lin",
+    "title": "智慧型射頻網路中一個全新的多通道出價拍賣法",
+    "english_title": "Yuan Ze University",
+    "advisor": "郭文興",
+    "year_roc": 103,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/林庭陽/",
+    "keywords": [
+      "林庭陽",
+      "Ting-Yang Lin",
+      "智慧型射頻",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "陸保任",
+    "english_author": "Bao-Raun Lu",
+    "title": "用LTE 4G網路做VANET後端連結的排程架構設計",
+    "english_title": "利用LTE 4G網路做VANET後端連結的排程架構設計",
+    "advisor": "郭文興",
+    "year_roc": 103,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/陸保任/",
+    "keywords": [
+      "Bao-Raun Lu",
+      "LTE",
+      "碩士論文",
+      "陸保任"
+    ]
+  },
+  {
+    "author": "徐睿誌",
+    "english_author": "Jui-Chih Shu",
+    "title": "車用網路中多跳的下行群播機制設計",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 104,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/徐睿誌/",
+    "keywords": [
+      "徐睿誌",
+      "車用網路",
+      "LTE",
+      "群播",
+      "多跳",
+      "碩士論文",
+      "Jui-Chih Shu"
+    ]
+  },
+  {
+    "author": "黃省翰",
+    "english_author": "shing han Huang",
+    "title": "電動機車之節能傳輸方法設計(最終",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 104,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/黃省翰/",
+    "keywords": [
+      "M2M家用閘道",
+      "黃省翰",
+      "碩士論文",
+      "shing han Huang"
+    ]
+  },
+  {
+    "author": "呂映萱",
+    "english_author": "ying hsueh Lu",
+    "title": "Massive MIMO 行動網路下使用者的天線分佈之研究",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 106,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/呂映萱/",
+    "keywords": [
+      "M2M家用閘道",
+      "ying hsueh Lu",
+      "碩士論文",
+      "呂映萱"
+    ]
+  },
+  {
+    "author": "王駿程",
+    "english_author": "jun cheng Wang",
+    "title": "物聯網電動載具管理系統之設計與實作",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 106,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/王駿程/",
+    "keywords": [
+      "M2M家用閘道",
+      "王駿程",
+      "碩士論文",
+      "jun cheng Wang"
+    ]
+  },
+  {
+    "author": "陳家豪",
+    "english_author": "jia hao Chen",
+    "title": "Massive MIMO 行動網路下基地台後端架構與天線分配之研究",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 106,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/陳家豪/",
+    "keywords": [
+      "M2M家用閘道",
+      "jia hao Chen",
+      "陳家豪",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "江銘洋",
+    "english_author": "jiang ming Yang",
+    "title": "物聯網通用閘道之架構設計與實作",
+    "english_title": "Framework and Implementation of General Gateway of IoT",
+    "advisor": "郭文興",
+    "year_roc": 107,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/江銘洋/",
+    "keywords": [
+      "M2M家用閘道",
+      "江銘洋",
+      "jiang ming Yang",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "林侑臻",
+    "english_author": "Lin,You-Jen",
+    "title": "Software and hardware architecture design of Internet of Things Industry 4.0 terminal device",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 108,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/林侑臻/",
+    "keywords": [
+      "林侑臻",
+      "Lin,You-Jen",
+      "物聯網工業4.0",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "徐明瑾",
+    "english_author": "Syu,Min-Gjin",
+    "title": "修正)5G網絡下虛擬實境傳輸的動態資源分配方法",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 109,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/徐明瑾/",
+    "keywords": [
+      "5G網絡",
+      "徐明瑾",
+      "碩士論文",
+      "Syu,Min-Gjin"
+    ]
+  },
+  {
+    "author": "邱顯毅",
+    "english_author": "Chiou,Shian-Yi",
+    "title": "物聯網閘道裝置上動態邊緣運算技術之設計與實作",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 109,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/邱顯毅/",
+    "keywords": [
+      "邱顯毅",
+      "Chiou,Shian-Yi",
+      "物聯網",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "易子杰",
+    "english_author": "Yi,Tz-Jie",
+    "title": "氫能無人機自動化任務規劃模型",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 111,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/易子杰/",
+    "keywords": [
+      "易子杰",
+      "無人機",
+      "碩士論文",
+      "Yi,Tz-Jie"
+    ]
+  },
+  {
+    "author": "楊智涵",
+    "english_author": "YANG, CHIH-HAN",
+    "title": "基於Arduino之私有雲資料備份系統之架構實作",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 112,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/楊智涵/",
+    "keywords": [
+      "YANG, CHIH-HAN",
+      "Android行動通訊",
+      "楊智涵",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "林政緯",
+    "english_author": "Lin,Jeng-Wei",
+    "title": "基於MQTT之自動化物聯網系統",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 112,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/林政緯/",
+    "keywords": [
+      "林政緯",
+      "Lin,Jeng-Wei",
+      "碩士論文",
+      "物聯網"
+    ]
+  },
+  {
+    "author": "張浚暢",
+    "english_author": "CHUN-CHANG, CHANG",
+    "title": "通用社群平台回訊系統的設計與實作",
+    "english_title": "Design and Implementation of a Universal Community Platform Reply System",
+    "advisor": "郭文興",
+    "year_roc": 113,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/張浚暢/",
+    "keywords": [
+      "張浚暢",
+      "雲端服務",
+      "社群平台",
+      "回訊系統",
+      "CHUN-CHANG, CHANG",
+      "碩士論文"
+    ]
+  },
+  {
+    "author": "周家仲",
+    "english_author": "Chou,chia-chung",
+    "title": "無人載具上之遠距遙控雙向傳輸系統之設計",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 113,
+    "month_roc": 7,
+    "nas_path": "/IRLshare/畢業論文/周家仲/",
+    "keywords": [
+      "無人載具",
+      "UAV",
+      "遠距遙控",
+      "雙向傳輸",
+      "行動通訊",
+      "Chou,chia-chung",
+      "碩士論文",
+      "周家仲"
+    ]
+  },
+  {
+    "author": "林威翰",
+    "english_author": "Lin,Wei-Han",
+    "title": "在社群平台上語意驅動的通用AI Agent系統設計與應用整合",
+    "english_title": "",
+    "advisor": "郭文興",
+    "year_roc": 114,
+    "month_roc": 1,
+    "nas_path": "/IRLshare/畢業論文/林威翰/",
+    "keywords": [
+      "語意驅動整合",
+      "AI Agent",
+      "社群平台",
+      "LLM",
+      "Lin,Wei-Han",
+      "碩士論文",
+      "林威翰"
+    ]
+  }
+]

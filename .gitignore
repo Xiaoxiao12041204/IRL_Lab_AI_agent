@@ -1,0 +1,23 @@
+# Python 虛擬環境與快取
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+venv/
+env/
+
+# 前端依賴與編譯輸出
+node_modules/
+dist/
+build/
+
+# IDE 與系統檔案
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 檢視器動態下載暫存（維護無痕原則）
+lab_assistant/thesis_viewer/*
+!lab_assistant/thesis_viewer/.gitkeep

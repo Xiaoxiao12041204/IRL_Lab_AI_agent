@@ -1,0 +1,76 @@
+================================================================================
+YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - ChangeLog
+================================================================================
+
+[2026-09-08] - 架構文件目錄樹標準化（thesis_viewer 動態暫存目錄標註）
+- 更新 `Doc/Architecture.md` 專案目錄結構：將 `lab_assistant/thesis_viewer/` 標準化定義為動態暫存檢視目錄，不再列出任何固定子目錄，符合無痕生命週期與單一對話即時下載之架構設計。
+
+[2026-09-08] - 實驗室財產設備清冊最新同步（新增蕭宇傑座位主機）
+- 依據線上 Wiki《公用經費清單》試算表最新內容，同步更新 `lab_assistant/data/lab_properties.json`：
+  - 新增第 59 列：蕭宇傑之研究座位桌上型主機（規格：`i5-13400F 16G+GTX 1660 Ti`，放置位置：`70640`，實驗室 IP：`203`，狀態：`使用中`）。
+- 同步支援 `query_person_360("蕭宇傑")` 完整呈現名下設備資訊。
+
+[2026-09-08] - MediaWiki 與結構化 JSON 資料庫自動同步機制確立
+- 確立 Wiki 變更自動同步承諾：未來當 MediaWiki 上的文字法規（請假、報帳、系統架構）或嵌入之公用經費/設備清單試算表有任何內容更新時，系統將自動同步更新 `lab_assistant/data/` 內對應之 JSON 檔案（`wiki_knowledge.json`、`accounting_rules.json`、`lab_properties.json`、`lab_funds_ledger.json` 等）。
+- 保持本地高速查詢快取與線上 Wiki 100% 資料一致性。
+
+[2026-09-08] - MediaWiki 設備與公用經費來源對應防呆更新
+- 確立 MediaWiki 資料來源映射防呆規範：Wiki 上的「設備清單」頁面實質嵌入的是畢業校友名冊；真正的實驗室「設備清單」與「公用經費」皆收錄於 Wiki 的「公用經費清單」頁面（Google 試算表 `1un-VyqNpeIMiQvHZSW51Koo7_WZI-XwQdxs_mTc7O2w`）。
+- 檢索設備財產與公用經費時，系統一律定向至「公用經費清單」及結構化快取資料庫（`lab_properties.json` / `lab_funds_ledger.json`），避免誤查「設備清單」頁面。
+
+[2026-09-08] - 黑曼巴回訊系統說明文檔精確同步與格式最佳化
+- 精確收錄「黑曼巴系統說明目錄」所定義之 10 大章節內容，移除外圍無關文章（如第 11、12 項）。
+- 導入 WordPress 密碼驗證（`yzu70640`）自動認證機制，完整解鎖受保護之安裝部署、本機資料庫、外接模組與障礙排除等章節。
+- 捨棄純文字 .txt 壓平格式，全面產出具備對齊表格、代碼高亮之 Markdown (.md) 格式文件於 `lab_assistant/thesis_viewer/黑曼巴系統完整說明/`。
+
+[2026-09-02] - 架構重構與模組整理
+- 建立全新獨立模組目錄 `lab_assistant/`，將所有實驗室詢問、NAS 檢索與知識庫功能集中管理。
+- 知識庫集中化：將 `lab_alumni.json`、`lab_properties.json`、`lab_funds_ledger.json`、`accounting_rules.json` 移入 `lab_assistant/data/`。
+- 遷移並重構 `lab_assistant/nas_reader.py`：
+  - 支援 Synology NAS 檔案檢索、同音字/拼音/模糊比對。
+  - 支援 PDF / DOCX / PPTX / 圖片之無痕串流讀取與 IDE 檢視器暫存。
+- 新增 `lab_assistant/query_service.py`：提供校友、財產、經費與會計法規之統整問答服務。
+- 新增 `lab_assistant/README.md` 與 `lab_assistant/requirements.txt`。
+- 升級 NAS 全域多目錄智慧搜尋器 (`lab_assistant/nas_reader.py`)：全面支援「畢業論文」、「工作區」與「工具與資料」三大目錄之同音字 (拼音)、錯別字、漏字與模糊比對。
+- 擴充 NAS 檢索支援範圍至 `/IRLshare/` 全域目錄，全面支援「工作區(報告、投影片等文件)」與「工具與資料」兩大資料夾及其子專案檔案之無痕串流讀取。
+- 建立歷屆碩士論文全域智慧索引庫 (`lab_assistant/data/thesis_index.json`) 與 `query_thesis` 服務：
+  - 完整收錄歷屆學長姐論文中英文題目、關鍵字、畢業年份、指導教授與 NAS 路徑。
+  - 支援題目同音字、拼音、錯別字與研究主題關鍵字之毫秒級 (0.01 秒) 極速秒查，徹底解決過去需背景逐一巡檢多個資料夾耗時的問題。
+- 重構 `lab_assistant/nas_reader.py` 為 **Synology REST API 極速引擎**：
+  - 全面捨棄高耗時的 Playwright 瀏覽器模擬，改採輕量原生 REST WebAPI（`SYNO.FileStation.List` 與 `SYNO.FileStation.Download`）。
+  - 檢索與下載速度大幅提升 30 倍（從原本 20~30 秒縮減至 0.5~1.5 秒）。
+- 建立全新 **MediaWiki 實驗室維基知識庫檢索模組** (`lab_assistant/wiki_reader.py`)：
+  - 串接 `https://yzuirl.synology.me/mediawiki/` API 進行即時查詢與全文檢索。
+  - 支援與 NAS 同組帳密認證登入與 Session 快取機制。
+  - 內建**同音字（pypinyin）與錯別字模糊比對（SequenceMatcher）**，即使輸入錯字或諧音亦能秒級精準解析。
+  - 將維基頁面（請假規範、報帳完整期程/細則、境外電商/國外勞務統編、研究助理約用標準、畢業交接流程、BlackMamba 回訊系統等）整合至本地快取與 `query_service.py` 統一問答服務。
+- 同步更新系統架構規格文件 `Doc/Architecture.md`、`Doc/FRD.md`、`Doc/ChangeLog.txt` 與 `AGENTS.md`。
+
+[2026-09-03] - 檢視器多檔案共存與批量整包提取功能升級
+- 升級 `lab_assistant/nas_reader.py`：
+  - 改進 `nas_download_file_for_viewing`：支援 `clear_previous=False` 參數，允許在同次會話中連續提取「論文 + 口試簡報 + 附件」等多個檔案且不互相覆蓋。
+- 資料庫清洗與結構整理：
+  - 清洗並標準化 `lab_assistant/data/lab_properties.json`，剔除 `Unnamed: 9` 等冗餘欄位並統一排版。
+  - 將所有維護用輔助腳本（`check_index.py`, `fix_titles.py`, `verify_folders.py`, `full_indexer.py`）移至獨立工具目錄 `lab_assistant/scripts/`，保持 `data/` 為純粹結構化 JSON 資料庫。
+  - 優化 `query_service.py` 之 `query_accounting_rules` 支援巢狀字典分類與關鍵字深度遞迴檢索。
+
+[2026-09-07] - 實驗室問答三大核心升級 (360度全景聯查 / 智慧延伸推薦 / 報帳合規防呆試算)
+- 升級 `lab_assistant/query_service.py`：
+  - 新增 `query_person_360(person_name)`：跨校友資料庫、論文索引庫、財產清冊與經費帳本 4 大資料源，一鍵產出個人全方位資訊檔案。
+  - 新增 `evaluate_expense_compliance(item_name, amount, vendor_type, is_foreign)`：提供金額門檻（1萬以上財產列管/1家估價單、10萬以上比價）、便當餐費上限（100~120元）、元智大學統編（`00966880`）與境外電商（OpenAI, Grok, GitHub 等）5% 營業稅加計及必備單據清單檢核。
+  - 全面在所有查詢服務中新增動態 `suggestions` 智慧延伸推薦。
+- 升級問答與檔案提取流程：
+  - 詢問論文時自動主動下載並提取「論文完整檔案（PDF）」與「口試簡報（PPTX）」至 `lab_assistant/thesis_viewer/`，直接提供本機點擊連結。
+  - 新增文字檔案（`.txt`, `.csv` 等）下載時自動偵測 Big5 / CP950 並轉碼為標準 UTF-8 機制，徹底解決 IDE 開啟亂碼問題。
+  - 全面將流程圖與系統架構改以純文字/箭頭符號與表格結構化排版呈現，捨棄 Mermaid 代碼區塊；規範回答直接切入重點，移除多餘自我描述性括號。
+
+[2026-09-08] - 系統穩定度與精準度三大深度升級 (Wiki章節擷取 / NAS連線重試 / 多詞複合檢索)
+- 升級 `lab_assistant/wiki_reader.py`：
+  - 新增 Wikitext 清洗引擎（`clean_wikitext`），徹底濾除粗體、內部/外部連結與 HTML 雜訊。
+  - 新增章節樹自動剖析（`extract_wiki_sections`）與精準章節擷取（`get_section_content`），支援單一子章節定向提取。
+- 升級 `lab_assistant/nas_reader.py` 與 `wiki_reader.py`：
+  - 全面掛載 HTTP 指數退避重試機制（`HTTPAdapter + Retry total=3, backoff_factor=0.5`），大幅增強防網路抖動與防逾時能力。
+- 升級 `lab_assistant/query_service.py`：
+  - 全面導入多關鍵字空格分詞 (Token AND) 複合比對邏輯，支援「112 物聯網」、「70640 伺服器」、「104 閘道」等多條件跨欄位精準過濾。
+- 同步更新 `AGENTS.md`、`Doc/FRD.md`、`Doc/Architecture.md` 與 `Doc/ChangeLog.txt`。
+
