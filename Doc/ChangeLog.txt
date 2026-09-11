@@ -2,6 +2,13 @@
 YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - ChangeLog
 ================================================================================
 
+[2026-09-11] - 知識庫 12 小時自動過期更新機制 (Cache TTL Auto-Sync)
+- 升級 `lab_assistant/query_service.py`：
+  - 導入「12 小時快取生命週期 (Cache TTL = 12 Hours)」檢驗邏輯 (`check_and_auto_sync`)。
+  - 當本地知識庫檔案修改時間超過 12 小時，系統在執行任何問答時會自動背景連線線上 MediaWiki/資料源更新快取並刷新實體檔案時間戳記。
+  - 內建優雅降級 (Graceful Fallback)：網路微斷線或遠端未回應時自動降級使用現有本地快取，確保問答 100% 順暢不中斷。
+  - CLI 支援 `python query_service.py sync` 手動強制觸發同步檢查。
+
 [2026-09-08] - 架構文件目錄樹標準化（thesis_viewer 動態暫存目錄標註）
 - 更新 `Doc/Architecture.md` 專案目錄結構：將 `lab_assistant/thesis_viewer/` 標準化定義為動態暫存檢視目錄，不再列出任何固定子目錄，符合無痕生命週期與單一對話即時下載之架構設計。
 

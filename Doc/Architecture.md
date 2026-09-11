@@ -18,6 +18,7 @@
             │
             ├── 知識庫問答與 360° 全景聯查服務 (query_service.py)
             │     ➔ 支援多詞複合檢索、合規試算防呆與延伸推薦
+            │     ➔ 內建 12 小時快取生命週期 (Cache TTL) 自動背景同步機制
             │
             ├── MediaWiki 實驗室維基百科整合引擎 (wiki_reader.py)
             │     ➔ 串接 yzuirl.synology.me/mediawiki/

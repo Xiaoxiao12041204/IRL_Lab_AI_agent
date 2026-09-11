@@ -6,6 +6,7 @@
 import os
 import sys
 import json
+import time
 import difflib
 
 if sys.platform == "win32":
@@ -18,7 +19,48 @@ if sys.platform == "win32":
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(CURRENT_DIR, 'data')
 
+# 12 小時快取過期時間 (秒)
+CACHE_TTL_SECONDS = 12 * 3600
+_LAST_CHECK_TIME = 0
+
+def check_and_auto_sync(force=False, max_age_seconds=CACHE_TTL_SECONDS):
+    """
+    檢查本地知識庫是否超過 12 小時未更新，若超時則自動連線線上 Wiki 進行背景快取刷新。
+    內建 Graceful Fallback，網路異常時自動降級使用現有快取，確保查詢不中斷。
+    """
+    global _LAST_CHECK_TIME
+    now = time.time()
+    
+    # 避免短時間內重複檢查 (至少間隔 5 分鐘檢查一次檔案時間戳)
+    if not force and (now - _LAST_CHECK_TIME < 300):
+        return False
+
+    _LAST_CHECK_TIME = now
+    wiki_cache_path = os.path.join(DATA_DIR, 'wiki_knowledge.json')
+    need_sync = force
+
+    if not os.path.exists(wiki_cache_path):
+        need_sync = True
+    else:
+        file_age = now - os.path.getmtime(wiki_cache_path)
+        if file_age > max_age_seconds:
+            need_sync = True
+
+    if need_sync:
+        try:
+            from wiki_reader import sync_wiki_cache
+            # 背景/即時刷新 Wiki 快取
+            res = sync_wiki_cache()
+            return res.get("status") == "success"
+        except Exception as e:
+            # 網路或連線失敗時優雅降級，不影響本地查詢
+            return False
+    return False
+
 def load_json(filename):
+    # 在載入知識庫時自動執行 12 小時過期檢查
+    check_and_auto_sync()
+    
     path = os.path.join(DATA_DIR, filename)
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
@@ -542,6 +584,9 @@ if __name__ == "__main__":
         amt = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0
         vendor = sys.argv[4] if len(sys.argv) > 4 else "國內"
         res = evaluate_expense_compliance(item_name=kw, amount=amt, vendor_type=vendor)
+    elif cmd == "sync":
+        sync_ok = check_and_auto_sync(force=True)
+        res = {"status": "success" if sync_ok else "failed", "synced": sync_ok, "message": "已完成強制同步檢查"}
     else:
         res = {"status": "error", "message": f"未知的指令: {cmd}"}
         
