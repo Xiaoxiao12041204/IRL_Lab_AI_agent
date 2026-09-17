@@ -2,6 +2,53 @@
 YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - ChangeLog
 ================================================================================
 
+[2026-09-17] - 實驗室官方網站 (https://irl.ee.yzu.edu.tw/) 即時檢索模組整合與專案檔案架構整理
+- 新增 `lab_assistant/official_site_reader.py`：
+  - 直連實驗室官方網站，即時抓取並解析 7 大單元內容（簡介、指導教授、成員、校友、產學合作實績、聯絡方式、誠徵新成員）。
+  - 支援 12 小時自動快取（Cache TTL）與即時線上回退機制。
+- 升級 `lab_assistant/query_service.py`：
+  - 新增 `query_official_website(topic)` 服務介面與 CLI `python query_service.py site [關鍵字]`。
+- 專案檔案架構整理與歸檔：
+  - 將 `install_wsl.bat` 移至 `openclaw_setup/` 資料夾統一歸檔。
+  - 將 OpenClaw 臨時測試與修復腳本整理至 `openclaw_setup/tests/`。
+  - 清理全專案 `__pycache__` 暫存檔，並跨工作區 100% 同步最新 `AGENTS.md`。
+- 同步更新專案規範與架構規格文件（`AGENTS.md`、`Doc/FRD.md`、`Doc/Architecture.md`、`Doc/ChangeLog.txt`）。
+
+
+[2026-09-16] - 經費查詢架構重構（直連 MediaWiki 知識庫，論文與設備維持 JSON）
+
+- 經費查詢路由升級：
+  - 將 `query_budget` / `query_funds` 全面重構為直接連線 MediaWiki（`wiki_reader.py`），精準調取線上《公用經費清單》頁面與 Google 試算表來源（`1un-VyqNpeIMiQvHZSW51Koo7_WZI-XwQdxs_mTc7O2w/#gid=9`），並同步檢索線上 Wiki 報帳與核銷法規。
+  - 本地經費流水帳本（`lab_funds_ledger.json`）轉為結構化補充明細與離線備援。
+- 資料來源分工明確化：
+  - 🎓 畢業論文：維持使用 `thesis_index.json` 及 NAS 即時串流檢索。
+  - 🖥️ 財產設備：維持使用 `lab_properties.json` 結構化高速檢索。
+  - 💰 公用經費：直連 MediaWiki 知識庫與線上試算表來源。
+- 專案文件與 OpenClaw 工作規範同步更新（`AGENTS.md`、`Doc/FRD.md`、`Doc/Architecture.md`）。
+
+[2026-09-14] - OpenClaw 平台整合部署 (OpenClaw Integration)
+- 新增 `openclaw_setup/` 目錄：專責 OpenClaw AI Agent 平台整合設定。
+  - `AGENTS.md`：IRL Lab 專屬 OpenClaw 工作規範（繁體中文、NAS/Wiki/知識庫工具調用指令）。
+  - `IDENTITY.md`：Agent 身份設定（名稱：IRL Lab 實驗室助理，Emoji：🧪）。
+  - `SOUL.md`：Agent 核心行為準則（無痕原則、合規報帳、主動推薦）。
+  - `USER.md`：使用者蕭宇傑的偏好設定（繁體中文、直接回答、3 個延伸推薦）。
+  - `irl_agent.py`：統一 CLI 入口腳本，整合 nas/query/wiki 三大功能模組。
+  - `deploy.sh`：自動化部署腳本（供手動重新部署使用）。
+- 完成 WSL2 (OpenClawGateway) 環境部署：
+  - 所有 `lab_assistant/` Python 模組複製至 `/home/openclaw/irl_lab/lab_assistant/`。
+  - 所有 7 個 JSON 知識庫複製至 `/home/openclaw/irl_lab/lab_assistant/data/`。
+  - Python 依賴套件（dotenv, PyPDF2, docx, pptx, synology_api 等）安裝至 `/home/openclaw/irl_lab/pylib/`（無需 root 權限）。
+  - OpenClaw workspace 設定檔部署至 `/home/openclaw/.openclaw/workspace/`。
+  - BOOTSTRAP.md 已移除，防止 OpenClaw 重複初始化。
+
+[2026-09-11] - 本地知識庫查詢效能基準測試 (Benchmark Tool & Testing)
+- 新增 `lab_assistant/scripts/benchmark_query_service.py`：建立自動化效能基準測試腳本。
+- 完整量測冷啟動與暖機平均延遲：
+  - 本地快取查詢（校友、設備、經費、法規、防呆試算）：平均回應時間介於 0.09 ms ～ 0.71 ms (< 1 毫秒)。
+  - 多分詞模糊比對論文檢索（`query_thesis`）：暖機平均 6.58 ms（初次含拼音庫載入 154 ms）。
+  - 360 度人物全景跨 4 庫聯查（`query_person_360`）：平均 8.25 ms。
+  - 遠端外網連線對比：NAS 認證與 MediaWiki 即時連線分別需 750 ms 與 994 ms。驗證本地快取效能提升達 100~1000 倍。
+
 [2026-09-11] - 知識庫 12 小時自動過期更新機制 (Cache TTL Auto-Sync)
 - 升級 `lab_assistant/query_service.py`：
   - 導入「12 小時快取生命週期 (Cache TTL = 12 Hours)」檢驗邏輯 (`check_and_auto_sync`)。

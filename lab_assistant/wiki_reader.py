@@ -316,6 +316,8 @@ def wiki_search(query):
         "top_content": exact_content
     }
 
+wiki_query = wiki_search
+
 def sync_wiki_cache():
     """同步 MediaWiki 全部頁面到本地快取 data/wiki_knowledge.json"""
     session = get_wiki_session()

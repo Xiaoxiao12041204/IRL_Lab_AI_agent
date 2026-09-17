@@ -16,19 +16,28 @@
             │     ➔ 串接 Synology FileStation REST API (yzuirl.synology.me:5001)
             │     ➔ 全域檢索三大核心目錄：/畢業論文/、/工作區/、/工具與資料/
             │
-            ├── 知識庫問答與 360° 全景聯查服務 (query_service.py)
-            │     ➔ 支援多詞複合檢索、合規試算防呆與延伸推薦
-            │     ➔ 內建 12 小時快取生命週期 (Cache TTL) 自動背景同步機制
-            │
             ├── MediaWiki 實驗室維基百科整合引擎 (wiki_reader.py)
             │     ➔ 串接 yzuirl.synology.me/mediawiki/
+            │     ➔ 💰【公用經費清單】直接檢索 Wiki 頁面與線上 Google 試算表
             │     ➔ 支援章節精準擷取、Wikitext 清洗與資料庫自動同步
+            │
+            ├── IRL 實驗室官網即時檢索引擎 (official_site_reader.py)
+            │     ➔ 串接 https://irl.ee.yzu.edu.tw/
+            │     ➔ 涵蓋簡介、指導教授、成員、校友、產學實績、聯絡方式、招募等 7 大單元
+            │     ➔ 支援 12 小時快取與線上即時爬取
+            │
+            ├── 知識庫問答與 360° 全景聯查服務 (query_service.py)
+            │     ➔ 🎓 論文與 🖥️ 設備維持使用本地結構化 JSON 高速查詢
+            │     ➔ 💰 經費查詢直連 MediaWiki 知識庫（本地帳本為備援與明細）
+            │     ➔ 🌐 簡介與實績直連 IRL 官方網站 (official_site_reader.py)
+            │     ➔ 支援多詞複合檢索、合規試算防呆與延伸推薦
+
             │
             └── 結構化資料庫 (lab_assistant/data/)
                   ├── 歷屆論文索引庫 (thesis_index.json)
                   ├── 歷屆校友名冊 (lab_alumni.json)
                   ├── 實驗室設備財產清冊 (lab_properties.json)
-                  ├── 計畫經費預算帳本 (lab_funds_ledger.json)
+                  ├── 計畫經費預算帳本 (lab_funds_ledger.json - 離線備援與明細)
                   ├── 會計報帳審核規則 (accounting_rules.json)
                   └── MediaWiki 頁面快取 (wiki_knowledge.json)
 ```
@@ -53,13 +62,16 @@ IRL_Lab_AI_agent/
     ├── nas_reader.py                        # NAS 即時檢索、同音字拼音模糊比對、PDF/Word/PPTX 串流解析
     ├── query_service.py                     # 校友、經費帳本、財產清冊、報銷法規智慧問答
     ├── wiki_reader.py                       # MediaWiki 串接、章節精準定位與快取同步
+    ├── official_site_reader.py              # 實驗室官方網站 (https://irl.ee.yzu.edu.tw/) 7 大單元即時爬取與快取
     ├── requirements.txt                     # 獨立依賴套件清單
+
     ├── README.md                            # 模組調用說明
     ├── scripts/                             # 維護與資料建置腳本
     │   ├── convert_wp_to_md.py              # WordPress 黑曼巴 10 大章節轉 Markdown 工具
     │   ├── full_indexer.py                  # 歷屆碩士論文全域建庫索引工具
     │   ├── verify_folders.py                # NAS 目錄完整性驗證工具
-    │   └── check_index.py                   # 索引庫健康檢查工具
+    │   ├── check_index.py                   # 索引庫健康檢查工具
+    │   └── benchmark_query_service.py       # 本地知識庫查詢效能基準測試工具
     ├── data/                                # 實驗室結構化 JSON 資料庫
     │   ├── thesis_index.json                # 歷屆碩士畢業論文全域智慧索引庫 (42篇)
     │   ├── lab_alumni.json                  # 歷屆校友與成員名冊 (41位)

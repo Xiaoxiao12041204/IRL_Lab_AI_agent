@@ -167,61 +167,66 @@ def query_properties(keyword=""):
     }
 
 def query_budget(keyword=""):
-    data = load_json('lab_funds_ledger.json')
-    if not data:
-        return {"status": "error", "message": "找不到經費帳本資料庫", "suggestions": []}
+    """
+    經費與公用經費查詢：改為直接連線 MediaWiki 知識庫（「公用經費清單」與「報帳」專區）檢索，
+    取得最新 Wiki 頁面內文、Google 試算表來源與相關核銷章節。
+    """
+    import wiki_reader
     
-    if not isinstance(data, list):
-        return {"status": "success", "data": data, "suggestions": []}
-
-    latest = data[-1] if data else {}
-    latest_balance = latest.get("結餘", 0)
-    latest_date = latest.get("日期", "")
-
-    if not keyword:
-        return {
-            "status": "success",
-            "total_transactions": len(data),
-            "latest_balance": latest_balance,
-            "latest_update_date": latest_date,
-            "recent_transactions": data[-15:],
-            "suggestions": [
-                "查詢近期差旅與便當費用支出",
-                "進行單筆報帳合規防呆試算 (如 35000元設備採購)",
-                "查詢境外電商 (OpenAI/Grok) 報帳細則"
-            ]
-        }
+    # 1. 優先至 MediaWiki 取得「公用經費清單」頁面
+    wiki_fund_page = wiki_reader.wiki_get_page("公用經費清單")
+    fund_url = "https://yzuirl.synology.me/mediawiki/index.php/%E5%85%AC%E7%94%A8%E7%B6%93%E8%B2%BB%E6%B8%85%E5%96%AE"
     
-    matches = []
+    # 2. 同步檢索 Wiki 報帳與經費相關條目
+    search_kw = f"經費 {keyword}".strip() if keyword else "公用經費"
+    wiki_search_res = wiki_reader.wiki_search(search_kw)
+    
+    # 3. 讀取本地帳本作為結構化歷史收支比對資料 (作為補充明細)
+    ledger_data = load_json('lab_funds_ledger.json') or []
+    latest_balance = ledger_data[-1].get("結餘", 0) if ledger_data else 0
+    latest_date = ledger_data[-1].get("日期", "") if ledger_data else ""
+    
+    matched_ledger = []
     total_change = 0.0
-    for entry in data:
-        note = str(entry.get("備註", "") or "")
-        date_str = str(entry.get("日期", "") or "")
-        item_str = str(entry.get("項目", "") or "")
-        full_entry_str = f"{note} {date_str} {item_str}"
-        
-        if _match_tokens_all(full_entry_str, keyword):
-            matches.append(entry)
-            amt = entry.get("收支金額(增減)")
-            if amt is not None:
-                try:
-                    total_change += float(amt)
-                except Exception:
-                    pass
+    if keyword and ledger_data:
+        for entry in ledger_data:
+            note = str(entry.get("備註", "") or "")
+            date_str = str(entry.get("日期", "") or "")
+            item_str = str(entry.get("項目", "") or "")
+            full_entry_str = f"{note} {date_str} {item_str}"
+            if _match_tokens_all(full_entry_str, keyword):
+                matched_ledger.append(entry)
+                amt = entry.get("收支金額(增減)")
+                if amt is not None:
+                    try:
+                        total_change += float(amt)
+                    except Exception:
+                        pass
+    elif not keyword and ledger_data:
+        matched_ledger = ledger_data[-10:]
 
     return {
         "status": "success",
+        "source": "MediaWiki (線上維基百科: 公用經費清單)",
+        "wiki_url": fund_url,
+        "spreadsheet_source": "Google 試算表 (1un-VyqNpeIMiQvHZSW51Koo7_WZI-XwQdxs_mTc7O2w/#gid=9)",
         "keyword": keyword,
-        "matched_count": len(matches),
-        "total_amount_change": total_change,
+        "wiki_content": wiki_fund_page.get("clean_content", "") or wiki_fund_page.get("content", ""),
+        "wiki_related_rules": wiki_search_res.get("matched_section", ""),
+        "matched_ledger_count": len(matched_ledger),
+        "total_amount_change": total_change if keyword else None,
         "current_balance": latest_balance,
-        "results": matches,
+        "latest_update_date": latest_date,
+        "ledger_details": matched_ledger,
         "suggestions": [
-            f"查看『{keyword}』相關會計報銷法規與核銷標準",
-            "試算該筆支出的估價單要求與統編防呆",
-            "查看實驗室目前最新總結餘與近期流水帳"
+            "前往 MediaWiki 查看最新線上《公用經費清單》試算表",
+            f"查詢『{keyword or '耗材/差旅'}』相關 Wiki 會計報銷法規與核銷標準",
+            "進行單筆經費報帳合規防呆試算 (如境外電商營業稅、估價單門檻)"
         ]
     }
+
+query_funds = query_budget
+
 
 def query_accounting_rules(question=""):
     data = load_json('accounting_rules.json')
@@ -409,10 +414,12 @@ def query_person_360(person_name):
     if prop_res.get("status") == "success" and prop_res.get("results"):
         profile["managed_properties"] = prop_res["results"]
 
-    # 4. 查經費帳本 (是否在備註出現)
+    # 4. 查經費帳本 (結合 Wiki 來源與收支備註)
     budget_res = query_budget(name)
-    if budget_res.get("status") == "success" and budget_res.get("results"):
-        profile["budget_records"] = budget_res["results"]
+    if budget_res.get("status") == "success":
+        profile["budget_records"] = budget_res.get("ledger_details", [])
+        profile["budget_wiki_source"] = budget_res.get("wiki_url")
+
 
     # 彙總摘要
     cname = profile["basic_info"].get("中文姓名") if profile["basic_info"] else name
@@ -558,9 +565,20 @@ def evaluate_expense_compliance(item_name="", amount=0.0, vendor_type="國內", 
         "suggestions": suggestions
     }
 
+def query_official_website(topic=""):
+    """
+    實驗室官方網站 (https://irl.ee.yzu.edu.tw/) 即時檢索服務
+    支援 7 大主題：簡介、指導教授、成員、校友、產學合作實績、聯絡方式、誠徵新成員
+    """
+    try:
+        import official_site_reader
+        return official_site_reader.query_official_site(topic)
+    except Exception as e:
+        return {"status": "error", "message": f"連線至官網失敗: {e}"}
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("用法: python query_service.py alumni|thesis|property|budget|rules|wiki|360|compliance [參數...]")
+        print("用法: python query_service.py alumni|thesis|property|budget|rules|wiki|site|360|compliance [參數...]")
         sys.exit(0)
         
     cmd = sys.argv[1]
@@ -572,12 +590,14 @@ if __name__ == "__main__":
         res = query_thesis(kw)
     elif cmd == "property":
         res = query_properties(kw)
-    elif cmd == "budget":
+    elif cmd in ("budget", "funds"):
         res = query_budget(kw)
     elif cmd == "rules":
         res = query_accounting_rules(kw)
     elif cmd == "wiki":
         res = query_wiki(kw)
+    elif cmd in ("site", "official", "web"):
+        res = query_official_website(kw)
     elif cmd == "360":
         res = query_person_360(kw)
     elif cmd == "compliance":
@@ -591,3 +611,4 @@ if __name__ == "__main__":
         res = {"status": "error", "message": f"未知的指令: {cmd}"}
         
     print(json.dumps(res, ensure_ascii=False, indent=2))
+
