@@ -23,7 +23,7 @@ NAS_ROOT_FOLDER = "/IRLshare/畢業論文"
 def get_creds():
     env = dotenv_values(ENV_PATH)
     host = env.get('NAS_HOST', 'yzuirl.synology.me:5001').replace('https://', '').replace('http://', '')
-    return host, env.get('NAS_USERNAME', '蕭宇傑'), env.get('NAS_PASSWORD', 'Xiao921204@')
+    return host, env.get('NAS_USERNAME', 'yujie'), env.get('NAS_PASSWORD', 'Xiao921204@')
 
 def api_login(session, host, user, pwd):
     url = f"https://{host}/webapi/auth.cgi"

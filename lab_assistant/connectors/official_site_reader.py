@@ -61,6 +61,35 @@ def _get_page_content(route):
         return f"連線至官網頁面失敗: {e}"
     return ""
 
+def _get_active_workstation_users_text():
+    possible_paths = [
+        os.path.join(CURRENT_DIR, "data", "lab_properties.json"),
+        os.path.join(CURRENT_DIR, "..", "lab_assistant", "data", "lab_properties.json"),
+        os.path.join(CURRENT_DIR, "lab_assistant", "data", "lab_properties.json"),
+        "/home/openclaw/irl_lab/lab_assistant/data/lab_properties.json"
+    ]
+    prop_path = next((p for p in possible_paths if os.path.exists(p)), None)
+    if not prop_path:
+        return ""
+    try:
+        with open(prop_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        users = []
+        for item in data:
+            user = item.get("使用者")
+            status = item.get("設備狀態")
+            if user and status == "使用中" and "公用" not in str(user):
+                user_str = str(user).strip()
+                ip = item.get("網路IP")
+                ip_display = f"IP: {int(ip)}" if isinstance(ip, (int, float)) and not str(ip).endswith(".5") else (f"IP: {ip}" if ip else "")
+                role = "智慧系統與 AI 助理開發者" if user_str == "蕭宇傑" else ("研究助理" if user_str == "邱子倫" else "碩士班研究生")
+                users.append(f"* {user_str} ➔ 身分：{role}，70640 實驗室主機使用中 ({ip_display})")
+        if users:
+            return "\n\n【實驗室現役使用中工作站成員名冊（含系統開發者與全體在學成員）】：\n" + "\n".join(users)
+    except Exception:
+        pass
+    return ""
+
 def fetch_all_pages(force=False):
     global _SITE_CACHE, _CACHE_EXPIRES
     now = time.time()
@@ -70,6 +99,10 @@ def fetch_all_pages(force=False):
     results = {}
     for key, route in PAGE_ROUTES.items():
         content = _get_page_content(route)
+        if key == "member":
+            extra_users = _get_active_workstation_users_text()
+            if extra_users:
+                content = (content or "") + extra_users
         results[key] = {
             "url": f"{SITE_BASE_URL}{route}",
             "content": content

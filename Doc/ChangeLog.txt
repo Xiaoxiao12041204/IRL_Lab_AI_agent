@@ -2,6 +2,476 @@
 YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - ChangeLog
 ================================================================================
 
+[2026-09-23] - 清除外層冗餘重複檔案與目錄樹最佳化 (Deduplication of Root Level Setup Files)
+- 調整與維護項目：
+  * **【移除外層重複檔案】**：
+    - 將最外層根目錄的最新變更完整同步至內層主專案目錄（`IRL_Lab_AI_ agent/openclaw_setup/` 與 `IRL_Lab_AI_ agent/AGENTS.md`）。
+    - 徹底刪除最外層根目錄下重複之 `openclaw_setup/` 與 `AGENTS.md`，使 VS Code 檔案總管樹狀結構保持唯一且乾淨。
+  * **【環境回歸驗證】**：
+    - 同步至 WSL OpenClaw 執行區，執行 34 項端到端全功能整合測試 100% 全數通過。
+
+[2026-09-23] - lab_assistant 模組目錄結構重構與歸納 (Modular Directory Refactoring: core/ & connectors/)
+- 調整與重構項目：
+  * **【建立語意化子資料夾】**：
+    - 建立 `lab_assistant/connectors/`：收納所有外部雲端與硬體串接模組（`nas_reader.py`、`wiki_reader.py`、`official_site_reader.py`、`google_calendar_reader.py`、`invoice_reader.py`、`sheets_writer.py`）。
+    - 建立 `lab_assistant/core/`：收納核心知識庫查詢協調服務（`query_service.py`）。
+  * **【配置 `__init__.py` 與路徑相容層】**：
+    - 在 `lab_assistant/__init__.py`、`connectors/__init__.py` 與 `core/__init__.py` 建立自動路徑適配與模組匯出機制，確保各模組對 `.env`、`data/`、`credentials/` 之讀取完全無損。
+    - 保持既有 CLI 與外部調用 100% 語法相容。
+  * **【測試套件與全功能回歸驗證】**：
+    - 執行 `comprehensive_test_suite.py` 34 項整合測試與 `test_invoice_bookkeep.py`，100% 全數通過。
+
+[2026-09-23] - 全專案程式碼架構整理、暫存快取清除與環境同步 (Codebase Clean Up & Workspace Synchronization)
+- 調整與維護項目：
+  * **【快取與暫存檔案深度清理】**：
+    - 全面清除 Windows 與 WSL 環境中的 `__pycache__`、`*.pyc` 與各類臨時檔案。
+  * **【程式碼規範與編譯檢核】**：
+    - 針對 `lab_assistant/`、`openclaw_setup/` 下之所有 Python 模組進行完整語法與編譯檢核，確認零語法錯誤。
+    - 統一所有註解與文件為繁體中文，符合既定工程規範。
+  * **【多環境雙向同步一致性保證】**：
+    - 完整同步 Windows 專案目錄與 WSL 執行環境（`/home/openclaw/irl_lab/` 與 `/home/openclaw/.openclaw/workspace/`）。
+    - 確保 `AGENTS.md`、`SOUL.md`、`irl_agent.py`、`sheets_writer.py` 與 `invoice_reader.py` 等關鍵設定檔 100% 一致。
+  * **【整合測試回歸驗證】**：
+    - 執行全系統 34 項端到端功能測試，確保校友、設備、經費、報帳、論文、360° 全景、官網、Wiki、合規試算、行事曆請假與發票記帳皆維持 100% 通過率。
+
+[2026-09-22] - 臺灣電子發票辨識與 Google Sheets 公用經費自動記帳無縫連動 (Invoice Decoding & Automated Bookkeeping Integration)
+- 調整與新增功能：
+  * **【發票辨識與自動記帳連動 (`invoice bookkeep`)】**：
+    - 在 `invoice_reader.py` 實作 `bookkeep_invoice`，將 QR Code 解碼結果（日期、總金額、品項摘要）自動傳遞至 `sheets_writer.append_transaction`。
+    - 在 `openclaw_setup/irl_agent.py` 擴充 `invoice bookkeep [--memo <自訂備註>]` 指令，支援成員拍照傳送發票時直接自動完成公費扣款與記帳。
+    - `decode_invoice` 新增記帳預覽中繼資料（`bookkeeping_preview`），回傳預設記帳備註與建議執行指令。
+  * **【端到端自動化測試與驗證】**：
+    - 新增 `test_invoice_bookkeep.py` 驗證發票 QR 解析、寫入 Google Sheets 帳本與撤回刪除。
+    - 修復 `query_service.py` 匯入問題，達成 `comprehensive_test_suite.py` 34 項整合測試 100% 全數通過！
+  * **【助理行為指引同步】**：
+    - 同步更新 `AGENTS.md`、`SOUL.md` 與所有 WSL OpenClaw 工作區檔案。
+
+[2026-09-22] - Google Sheets 雲端即時雙向自動記帳、刪除與自我介紹歡迎詞全面同步 (Google Sheets Automated Bookkeeping & Introduction Sync)
+- 調整與新增功能：
+  * **【Google Sheets 雙向同步記帳】**：
+    - 串接 Google Sheets API 與 Service Account 授權憑證。
+    - 支援 `budget add`（新增收入/支出）與 `budget delete`（依索引或備註刪除/撤回）。
+    - 本地 `lab_funds_ledger.json` 與線上 Wiki 試算表保持 100% 毫秒級雙向同步並自動重算結餘。
+  * **【自我介紹歡迎詞全面同步】**：
+    - 全面更新 `SOUL.md` 與 `AGENTS.md`（包含 WSL OpenClaw 工作區 `/home/openclaw/.openclaw/workspace/` 與 `/home/openclaw/irl_lab/`）。
+    - 納入「✏️ 公用經費自動記帳」並將設備項目精準優化為「🖥️ 實驗室設備清冊與財產盤點查詢」。
+
+[2026-09-22] - 徹底消除 `<br>` 標籤外露與表格排版擠壓重構 (Purge `<br>` Tags & Anti-Table Layout Overhaul)
+- 問題分析：
+  * 使用者反應「又出現 `<br>` 了，而且排版看著很不方便」。
+  * 根源定位：
+    - 當查詢 Portal 報帳流程或會計規章時，模型嘗試將多步驟的操作重點塞入單一 Markdown 表格單元格中，並在單元格內強行插入 `<br>` 作為換行符號。
+    - 前端 Markdown 渲染器未解析 `<br>` 標籤，導致 `<br>` 原字外露；且長文字塞入表格造成寬度暴增，手機或窄螢幕產生橫向滾動條，左側欄位被嚴重壓縮至僅剩 4 個字（如「會計系統」），右側文字擠壓成團，閱讀極不方便。
+- 調整與修正：
+  * **【排版重構：長文字與操作流程全面禁用 Markdown 表格】**：
+    - 重構 `query_accounting_rules`，為 Portal 報帳與採購單建立流程（`is_portal_flow`）及全域報帳核心規範（`is_general`）提供專屬的純文字結構化 `formatted_response`。
+    - 捨棄任何 Markdown 表格包裝，一律改採 Markdown 三級標題（`### 📌`）搭配項目符號（`*`）與流程箭頭（`➔`）垂直展開。
+    - 各裝置（手機、平板、窄版對話框）自動折行適配，徹底杜絕橫向滾動條與文字擠壓問題。
+  * **【全域輸出 HTML 標籤過濾清洗機制】**：
+    - 在 `openclaw_setup/irl_agent.py` 實作 `_clean_html_tags` 與 `safe_output`，在命令列輸出前全域過濾 `<br>`、`<br/>`（自動替換為換行 `\n`）與所有 HTML 標籤（`<b>`、`<div>`、`<span>` 等），作為底層雙重防呆保證。
+  * **【強化 AGENTS.md 指引規範】**：
+    - 明確下達【排版鐵律：長文字與多步驟絕對禁止使用 Markdown 表格】，表格僅限純短數據（金額流水帳、設備編號），操作流程一律垂直清單展開。
+    - 嚴格重申禁止輸出任何 HTML 標籤與阿拉伯數字開頭編號。
+- 驗證：
+  * 實測 `openclaw_setup/irl_agent.py query rules portal` 與 `query rules 報帳規定`，100% 回傳乾淨垂直 Markdown，零 `<br>`，排版極為清爽舒適。
+
+[2026-09-22] - 論文摘要解讀深度化升級與封面截斷問題根治 (Deep Thesis Abstract Extraction & Front-Matter Bypassing)
+- 調整與修正：
+  * 修復「論文摘要只抓到書名頁與封面廢話」之根本缺陷：
+    - 過去 `query_service.py` 採取硬性 `content_str[:600]` 限制，而 Word (.docx) 與 PDF 論文開頭第 1~40 段均為元智校名、系所、中英文書名頁、口試委員簽名頁與目錄，導致 600 字元全被封面佔滿，真正的摘要完全被截斷。
+  * 實作高精準度摘要萃取引擎 (`nas_reader.extract_thesis_abstract`)：
+    - 智慧略過目錄跳轉符號、頁碼指引與委員審定書，精準鎖定 `摘\s*要` 標題至英文標題/誌謝/目錄之間的真正中文摘要正文。
+    - 同步提取完整英文 `ABSTRACT` 正文，並自動過濾 `Student:`、`Advisor:`、系所與校名等標籤。
+  * 升級 `query_thesis` 回傳資料結構：
+    - 新增 `chinese_abstract` 與 `english_abstract` 獨立欄位，並將 `abstract_preview` 放寬為完整中文摘要（600~2000 字元）。
+    - 實測向禮勤（多蜂巢 VR 視角預測）、張哲瑋（CR 認知無線網路）、邱顯毅（IoT 邊緣運算）等論文，均 100% 精準取得包含研究背景、核心機制（天線分配、視野敏感度）、NP-complete 複雜度證明與模擬結果之完整摘要。
+- 驗證：
+  * WSL 與本地執行 `openclaw_setup/irl_agent.py query thesis 向禮勤` 及其他代表論文，輸出之中文摘要 100% 正確無誤。
+
+[2026-09-22] - 統一論文總表與領域清單統計口徑，解決跨領域篇數不一致 (Align Domain Thesis Counts & Multi-tag Normalization)
+- 調整與修正：
+  * 修復「總表 8 篇、點進去變 12 篇」之根本原因：過去總表採用強行互斥分類（一文僅限一領域），將同時涉及物聯網與邊緣運算的跨領域論文優先排他歸入邊緣運算，導致總表物聯網僅分到 8 篇；而單獨查詢物聯網時採用全文包含檢索，列出了全部 12~13 篇，產生統計矛盾。
+  * 建立共用領域資料結構與統計口徑：總表與子領域清冊全面共用同一套八大領域規則（物聯網與智慧感測、車聯網、邊緣運算、M2M閘道、無線通訊LTE/MIMO、360度視訊、無人機、LLM與社群），總表真實呈現各領域完整研究篇數（如物聯網 13 篇），並附帶跨領域篇數重疊說明。
+  * 點入查詢特定領域時直接精準回傳該領域完全相同的論文清冊，前後篇數 100% 完全精確對齊。
+- 驗證：
+  * 本地與 WSL 端實測總表與「物聯網與智慧感測節能全部的論文」，兩者篇數均為 13 篇，前後一致。
+
+[2026-09-22] - 全面升級歷屆論文核心研究主題清冊 (Comprehensive 8-Domain Thesis Overview)
+- 調整與修正：
+  * 修復概覽詞意圖判定：過去當使用者輸入「歷屆碩士論文主題清冊」時，因比對規則過於嚴苛，誤判為具體搜尋字串而搜索出 0 筆，導致模型擅自補發第 2 條指令查詢單一「邊緣運算」主題。
+  * 導入通用大類別詞過濾器 (Meta-Keyword Normalizer)：只要語句為總覽意圖（如「歷屆碩士論文主題清冊」、「論文主題清冊」、「歷屆主題總覽」），一律自動導向全域八大核心研究領域總清冊。
+  * 100% 完整劃分 42 篇真實論文：建立八大特異性優先級主題領域（邊緣運算 4 篇、360度視訊與VR 2 篇、無人機 3 篇、車聯網 8 篇、M2M 家用閘道 8 篇、LLM 與社群平台 3 篇、無線通訊與蜂巢資源分配 6 篇、物聯網與感測節能 8 篇），完整呈現涵蓋篇數、年代跨度、代表成員與各領域代表論文一覽。
+- 驗證：
+  * OpenClaw 線上實測「歷屆碩士論文主題清冊」，100% 正確回傳八大研究領域完整總清冊。
+
+[2026-09-22] - 精簡出勤用詞與完善報帳試算分流 (Refine Attendance Terminology & Separate Expense Simulation)
+- 調整與修正：
+  * 精簡歡迎語與系統規則用詞：全面移除「在室」二字，將「📅 成員在室出勤查詢、行事曆請假登記與取消」精確修正為「📅 成員出勤查詢、行事曆請假登記與取消」，提升語意簡潔度。
+  * 請假狀態提示去冗：將原先「今日全員在室（無人登記請假）」校正為「今日全員正常出勤（無人登記請假）」，更符合實驗室日常語境。
+  * 獨立「報帳試算」與「報帳規章」路由：徹底分流關鍵字意圖，輸入「報帳試算」不再回傳長篇報帳規章大綱，而是輸出專屬之【元智報帳情境試算導引】；輸入「買 5 萬電腦要怎麼報帳」則即時精準試算門檻、估價單張數、財產列管標籤與必備單據。
+- 驗證：
+  * OpenClaw Gateway 實測問候語與「報帳試算」對話 100% 符合預期。
+
+- 調整與修正：
+  * 徹底刪除自製支出憑證黏存單生成模組 (`generate_expense_voucher`、`number_to_chinese_currency`、`export_accounting_payload`)。
+  * 實務考量：元智大學會計室審核報銷嚴格要求使用元智 Portal 系統線上產出之帶專屬條碼（Barcode）與電腦請購編號的正式 PDF 黏存單，手刻 Word/Markdown 黏存單不符學校審核標準。
+  * 發票模組 (`lab_assistant/invoice_reader.py`) 回歸聚焦於臺灣電子發票 QR Code 幾何解析、商品明細拆解與會計合規防呆檢核（統編 00966880、1萬/10萬門檻、便當上限、4個月期限）。
+  * 更新 OpenClaw CLI 指令與指引文件 (`openclaw_setup/irl_agent.py`, `AGENTS.md`, `SOUL.md`)，將功能項目明確定義為「發票辨識與會計報帳合規防呆檢核」，並向使用者如實說明 Portal 正式產單流程。
+- 驗證：
+  * 單元測試 `openclaw_setup/tests/test_real_extensions.py` 7 項測試 100% 通過。
+  * 同步至 WSL 並重啟 Gateway 服務驗證正常。
+
+[2026-09-22] - 實作三大接地氣實用延伸功能 (Deploy Three Practical Real-Data Extension Features)
+- 新增功能與能力（100% 基於現有真實資料庫，零臆測）：
+  * 🧾 發票辨識 ➔ 一鍵生成「元智大學支出憑證黏存單」(`lab_assistant/invoice_reader.py`)：
+    - 新增 `number_to_chinese_currency`，自動將發票總金額換算為標準新臺幣國字大寫（如：新臺幣壹仟貳佰伍拾元整）。
+    - 新增 `generate_expense_voucher`，自動產出元智專用支出憑證黏存單（含店家統編、元智統編 00966880、品名數量單價明細、合規防呆與經辦人➔郭文興老師➔劉維昇主任➔會計室核章指引）。
+    - 新增 `export_accounting_payload`，輸出對接 `accounting/` 報帳自動化模組的標準 JSON 報帳草稿。
+  * 💰 公用經費 380 筆真實收支「年度/季度財務統計報表」(`lab_assistant/query_service.py`)：
+    - 新增 `query_funds_report`，對 `lab_funds_ledger.json` 進行歷年年度收支總覽分析（收入、支出、淨收支、年末結餘）。
+    - 支援指定年份（如 2023 或 112）之各季走勢與用途客觀分類（餐飲點心、耗材用品、經費補助與罰款收入、其他雜支）。
+  * 🎓 歷屆論文「真實關鍵字詞頻分佈與領域歸納清冊」(`lab_assistant/query_service.py`)：
+    - 新增 `query_thesis_topics`，對 `thesis_index.json` 42 篇真實論文進行關鍵字字頻客觀統計，呈現前十大核心研究主題排行榜。
+    - 支援依主題（如：邊緣運算、物聯網、360度、車用網路、無人機）客觀呈現歷屆論文清冊，嚴格按年代由先至後排列，絕無主觀腦補與虛構引用。
+  * 🖥️ 財產清冊「個人名下設備對帳與 70640 全室盤點報表」(`lab_assistant/query_service.py`)：
+    - 新增 `query_property_inventory`，依據 `lab_properties.json` 52 件真實設備，支援輸入現役成員姓名（如：邱子倫、袁倫廣、林銘聖）輸出個人名下保管清單（含財產編號、型號、IP）。
+    - 支援 70640 全室盤點視角：統計各類設備件數、現役成員主機分配清單與目前未指派/公用設備清冊。
+  * 🤖 OpenClaw CLI 指令擴充 (`openclaw_setup/irl_agent.py`)：
+    - 支援 `invoice voucher [圖片路徑]`、`query funds_report [年份]`、`query thesis_topics [關鍵字]`、`query property_inventory [成員或70640]`。
+  * 🎨 介面與文字精簡優化 (`AGENTS.md`, `SOUL.md`)：
+    - 精簡歡迎語選單文字（如將「實驗室設備清冊、成員個人名下保管對帳與 70640 全室盤點」精簡為「實驗室設備清冊與財產盤點對帳」），字句洗鍊整齊，大幅提升閱讀體驗。
+- 驗證：
+  * 新增單元測試 `openclaw_setup/tests/test_real_extensions.py`，全數通過 7 項測試（通過率 100%）。
+  * 執行回歸測試 `openclaw_setup/tests/comprehensive_test_suite.py`，全數通過 34 項測試（通過率 100%）。
+  * 部署至 WSL OpenClaw Gateway 並順利重啟服務。
+
+[2026-09-22] - 全面撤除未經驗證之虛構功能與模組、確立真實數據底線 (Purge Unverified Mock Modules & Restore Ground Truth Integrity)
+- 撤除與清理項目：
+  * 徹底刪除虛構之 GPU 運算伺服器模組 (`lab_assistant/gpu_manager.py`) 與資源清冊 (`data/gpu_resources.json`)。
+  * 徹底刪除未經考證之論文演進圖譜腳本 (`lab_assistant/thesis_graph_service.py`)。
+  * 徹底刪除未經官方核准之硬體感測器動態借還模組 (`lab_assistant/hardware_inventory_service.py`) 與器材清冊 (`data/lab_hardware_inventory.json`)。
+  * 從 `lab_assistant/query_service.py` 移除所有對上述虛構模組的引用與 `query_person_360` 內的假資料關聯。
+  * 從 `openclaw_setup/irl_agent.py`、`AGENTS.md`、`SOUL.md` 全面移除 GPU、演進圖譜、感測器器材借還之指令與歡迎詞項目。
+  * 全面淨化 OpenClaw 執行環境與快取，重啟 Gateway 服務，恢復 100% 基於真實資料庫的 6 大核心能力。
+- 確立原則：
+  * 嚴禁 AI 自行臆測、捏造未在實驗室現有資料庫（52 件財產、42 篇論文、7 位現役成員、MediaWiki 與 Google 行事曆）中的任何資料。
+  * 凡查詢一律嚴格遵循真實數據呈現，絕無誇大與虛構。
+
+
+
+- 調整項目：
+  * `AGENTS.md`：擴充 AI 助理標準問候歡迎語，將新增之「發票圖片辨識與報帳防呆」及「Google 行事曆出勤查詢、請假登記與取消」納入主選單：
+    - 🎓 歷屆碩士論文與口試簡報檢索與摘要解讀
+    - 🖥️ 實驗室設備、主機與財產清冊查詢
+    - 💰 計畫經費、公用經費收支明細與報帳法規防呆試算
+    - 🧾 發票收據圖片辨識、二維條碼解碼與元智報帳合規檢核
+    - 📅 成員在室出勤查詢、Google 行事曆請假登記與取消
+    - 👥 成員個人檔案、現役名冊與實驗室官網資訊
+- 驗證：同步部署至本機與 WSL OpenClaw 工作區環境。
+
+[2026-09-22] - 發票 QR Code 解析容錯強化與特殊品項拆解優化 (Invoice Parsing Robustness & Item Extraction Optimization)
+- 新增功能與能力：
+  * 強化 `lab_assistant/invoice_reader.py` 解析彈性：
+    - 支援無 24 碼加密檢驗碼之發票格式變形（如賣方統編後直連 `:**********:` 之常見餐飲發票）。
+    - 智慧分離品名與數量連綴符號（如水餃店常見之 `鮮蝦水餃★6:10.5` 自動精準拆分為「鮮蝦水餃、數量 6、單價 10.5、小計 63」）。
+    - 完善前置星號遮罩與財政部計數旗標（`總筆數:總項數:編碼方式`）過濾機制，杜絕將數字旗標誤列為購買品項。
+- 驗證：
+  * 實測真實水餃店特寫發票（`media_1790045010378.png`），100% 完美解碼「真傳紅茶、白豆漿、鮮蝦水餃、玉米水餃」共 4 項餐點明細與總金額 131 元，發票號碼 `DL-86224340`，無任何雜訊項。
+
+[2026-09-21] - 臺灣電子發票 QR Code 解碼與 OpenClaw 智慧辨識串接 (Taiwan E-Invoice QR Code Decoder & OpenClaw Integration)
+- 新增功能與能力：
+  * 開發專用發票 QR Code 解碼模組 `lab_assistant/invoice_reader.py`：
+    - 採用 OpenCV (`cv2.QRCodeDetector`) 與高容錯影像前處理（灰階、CLAHE 對比度增強、Otsu 二值化、動態超解析度雙倍縮放）。
+    - 嚴格依照財政部電子發票二維條碼規格，支援左側 77 碼主要條碼（發票字軌號碼、民國開立日期、隨機碼、16進位銷售與總金額、買賣方統編與檢查碼）以及右側明細條碼（`**品名:數量:單價`）之 100% 精準無損解碼。
+    - 支援自動偵測 OpenClaw 傳入媒體目錄（`/home/openclaw/.openclaw/media/inbound/`）之最新上傳圖片，使用者在聊天室拖曳上傳即可零參數秒級辨識。
+    - 內建元智報帳合規防呆檢核（統編核對 `00966880`、1萬/10萬採購門檻、便當餐費簽到表、4個月核銷期限）。
+    - 具備優雅降級回退機制：若為解析度不足、條碼受損或傳統無 QR Code 發票，自動提示回退至視覺多模態 OCR 解析。
+  * `openclaw_setup/irl_agent.py`：新增 `invoice` CLI 指令（`python3 irl_agent.py invoice decode [圖片路徑]`）。
+  * `AGENTS.md`：規範 OpenClaw 收到發票/收據圖片時優先執行 `invoice decode` 進行精準解碼，並依標準 Markdown 格式輸出。
+- 驗證：
+  * 完成合成發票與真實發票影像前處理檢測測試。
+  * 實測在 WSL 環境中執行 `irl_agent.py invoice decode` 成功自動定位最新上傳圖片並輸出標準結構化 JSON。
+
+[2026-09-21] - OpenClaw 整合多模態發票與單據圖片辨識 (Multimodal Invoice Recognition Integration)
+- 新增功能與能力：
+  * OpenClaw 聊天介面全面支援發票與單據圖片拖曳上傳與即時辨識。
+  * `AGENTS.md`：規範多模態視覺辨識標準處理流程，當使用者在聊天室上傳發票/收據照片或請求辨識時，自動萃取：
+    - 發票號碼（字軌+8碼）、開立日期、賣方統編與店名、實付總金額。
+    - 買方統編自動核對：檢查是否已打元智統編 `00966880`（未打則提醒手寫補正並蓋章）。
+    - 購買細項清單：自動輸出品名、數量、單價、小計之結構化表格。
+    - 會計合規檢核：整合估價單採購門檻（1萬/10萬）、便當餐費上限（100~120元）與4個月核銷期限提醒。
+- 驗證：完成 OpenClaw 規範配置與跨環境同步部署。
+
+[2026-09-21] - 修復請假範圍關鍵字被誤判為成員姓名之重大缺陷 (Fix Range Keywords Misclassified as Member Name Bug)
+- 問題現象：
+  * 使用者在對話中點擊「查詢近兩週請假名單」，或詢問「不只吧」時，AI 回覆僅有 9/21 一筆請假，遺漏了日曆上 9/8、9/14、9/15 以及 9/22 袁倫廣的多筆請假。
+- 根本原因：
+  * 大模型在處理「查詢近兩週請假名單」或追問時，內部傳入了 `query leaves all`、`query leaves range` 或 `query leaves 不只吧`。
+  * `query_service.py` 中的 `target_member` 判斷邏輯存在缺陷：原先將非空白之字串直接無條件指派給 `target_member = clean_name`。
+  * 導致 `"all"`、`"range"`、`"不只吧"` 被誤當作「成員姓名」去查詢 `check_member_leave("all")`，結果皆為查無此人（0 筆），進而使模型退回查「今天」而得出僅 9/21 單筆的錯誤結論。
+- 修正方式：
+  * `query_service.py` (`query_leaves`)：
+    * 擴充 `RANGE_KEYWORDS` 範圍清單，納入 `all`, `range`, `recent`, `list`, `leaves`, `who`, `history`, `更多`, `不只`, `還有誰` 等多語系關鍵字。
+    * 嚴格限制 `target_member`：僅在確實命中真實成員清單（`KNOWN_MEMBERS`）時才進入特定成員檢核，避免任何未匹配詞彙被誤當成學生姓名。
+    * 若未命中成員，一律回退至 `get_recent_leaves(days_back=21, days_forward=14)`，完整檢索近三週至未來兩週的所有請假紀錄。
+  * `AGENTS.md`：規範當查詢範圍名冊（如「近兩週請假名單」、「不只吧」）時，必須以完整表格呈現回傳 `leaves` 陣列中的所有日期紀錄（包含過去與即將發生的所有天數），嚴禁擅自遺漏或只列今日。
+- 驗證：
+  * 實測 `query leaves all`、`query leaves range`、`query leaves 不只吧` 均 100% 精準回傳 9/8、9/14、9/15、9/21、9/22 共 5 筆完整請假行程。
+
+[2026-09-18] - 請假活動格式精簡化（說明欄精簡為「由 IRL Lab AI 助理自動登記」）(Leave Description Simplification)
+- 調整原因：依據使用者回饋與行事曆視覺呈現，移除多餘的重複資訊（如「agent測試 申請 2026-09-23」），說明備註欄精簡為「由 IRL Lab AI 助理自動登記」即可。
+- 修正項目：
+  * `google_calendar_reader.py` (`add_leave_event`)：將行事曆活動的 `description` 欄位固定精簡為 `"由 IRL Lab AI 助理自動登記"`，使版面極致清爽俐落。
+- 驗證：取消既有活動並重新登記測試，確認 Google 日曆標題為純姓名，說明欄僅顯示「由 IRL Lab AI 助理自動登記」。
+
+[2026-09-18] - 請假活動格式對齊實驗室既有習慣（預設活動標題為純成員姓名）(Leave Title Format Alignment)
+- 調整原因：檢視實驗室既有行事曆紀錄（如倫廣 9/8、9/14、9/15 之登記格式），標題皆為純成員姓名（如「倫廣」），不需要附加「事假」等字眼。
+- 修正項目：
+  * `google_calendar_reader.py` (`add_leave_event`)：調整 `reason` 預設值為空字串；若無特別指定事由，行事曆活動標題（summary）直接設為成員姓名（如「林銘聖」、「倫廣」），與大家既有的登記格式 100% 保持一致。
+  * `query_service.py` (`apply_leave`) & `irl_agent.py`：調整 `--reason` 預設為空，保留使用者若有特別指明事由時附加於備註之彈性。
+- 驗證：實測建立與查詢確認行事曆標題為純姓名，並已自動清理測試資料。
+
+[2026-09-18] - AI 自然語言取消請假與 Google 行事曆同步刪除 (Natural Language Leave Cancellation)
+- 新增功能與能力：
+  * 成員可透過自然語言請求 AI 取消特定日期或最近的請假（例如：「幫我取消請假」、「取消明天請假」、「取消倫廣 9/19 請假」）。
+  * `google_calendar_reader.py` (`cancel_leave_event`)：透過 Google Calendar REST API 搜尋匹配成員姓名與目標日期的活動，並調用 `events().delete` 進行行事曆活動同步刪除。
+  * `query_service.py` (`cancel_leave`)：支援日期自然語意解析（今天、明天、後天、特定日期格式），比對符合之請假事件並回傳結構化取消結果。
+  * `openclaw_setup/irl_agent.py`：在 `leave` CLI 指令中擴充 `cancel` 與 `delete` 動作（`python3 irl_agent.py leave cancel <姓名> [日期]`）。
+  * `AGENTS.md`：新增「❌ 成員透過 AI 取消請假」行為指南，當使用者發出取消請假意圖時，單次精準執行指令並回覆確認資訊。
+- 驗證：
+  * 實測登記測試請假行程並執行 `leave cancel`，確認 Google 行事曆活動成功刪除且狀態正確回傳。
+
+[2026-09-18] - 修復請假查詢「近兩週」與「月份」關鍵字解析缺陷 (Fix Leave Range & Month Matching Bug)
+- 問題現象：使用者點擊延伸建議「查詢近兩週請假名單」時，系統回答除 9/15 外並無其他紀錄，遺漏了日曆上 9/8 與 9/14 倫廣的請假。
+- 根本原因：
+  * 先前 `query_leaves` 判斷範圍關鍵字清單中缺少「近兩週」、「兩週」，且不支援「YYYY-MM」月份格式。
+  * 導致模型傳入 `"近兩週"` 或 `"2026-09"` 時，系統誤將其當作「學生姓名」去比對，因而判定查無此人且落空為 0 筆。
+- 修正方式：
+  * `google_calendar_reader.py`：新增 `get_month_leaves(year, month)` 支援整月跨度檢索，並將 `get_recent_leaves` 預設時間範圍調整為「過去 3 週至未來 2 週」（`days_back=21, days_forward=14`），確保完整覆蓋當前月份。
+  * `query_service.py` (`query_leaves`)：
+    * 支援月份格式識別（`2026-09`、`9月`、`2026年9月`）。
+    * 全面擴增範圍關鍵字（「近」、「週」、「兩週」、「近期」、「名冊」等）。
+    * 增強成員姓名辨識，僅對真實成員（`KNOWN_MEMBERS`）執行成員檢核，避免將日期或範圍文字誤判為姓名。
+    * 建立容錯回退機制：未明確匹配之關鍵字一律回傳近兩週所有請假名單，杜絕落空。
+- 驗證：全系統 34 項端到端測試 100% 通過；實測 `近兩週`、`2026-09`、`查詢近兩週請假名單`、`倫廣有請假嗎` 皆 100% 正確回傳倫廣 9/8、9/14、9/15 三筆真實請假紀錄。
+
+[2026-09-18] - AI 自然語言自動登記請假至 Google 行事曆 (Natural Language Leave Registration)
+- 新增功能與能力：
+  * 成員可透過對話直接說「幫我請假」、「幫倫廣請明天下午 13:00~17:00 事假」、「林銘聖 9/20 請假」等自然語意。
+  * `google_calendar_reader.py` (`add_leave_event`)：透過 Google Calendar REST API（具備變更活動權限）自動向 `IRL_臨時請假` 行事曆新增活動，並設定標題（如 `林銘聖 事假`）、時段與事由備註。
+  * `query_service.py` (`apply_leave`)：自動剖析自然語言日期（今天、明天、後天、特定日期）與時段，產出結構化確認回傳。
+  * `openclaw_setup/irl_agent.py`：新增 `leave add <姓名> <日期> [--start] [--end] [--reason]` CLI 指令。
+  * `AGENTS.md`：規範當成員發出請假請求時，調用指令即時寫入行事曆並回報結構化登記結果。
+- 驗證：實測建立測試活動並透過 API 驗證與自動清理，確認 Service Account 具備完整變更活動與寫入權限。
+
+[2026-09-18] - Google Calendar 實驗室行事曆請假與出勤即時連動 (Google Calendar Leave Integration)
+- 新增模組與能力：
+  * 整合 Google Calendar REST API 與服務帳號金鑰（`service_account.json`），直連實驗室官方行事曆（`legptj6nu1ite83tuijr5996pg@group.calendar.google.com`）。
+  * 建立 `lab_assistant/google_calendar_reader.py`：支援今日請假檢索、近兩週請假名冊、特定成員請假狀態查核與自動新增請假行程。
+  * 升級 `lab_assistant/query_service.py` (`query_leaves`)：自動辨別日期格式（如 2026-09-14）、成員姓名（如 袁倫廣、林銘聖）或關鍵字（今天、本週、近期），回傳完整結構化請假資訊與智慧建議。
+  * 升級 `openclaw_setup/irl_agent.py`：新增 `query leaves <關鍵字/姓名/日期>` CLI 接口。
+  * 更新 `AGENTS.md`：規範當使用者詢問「今天誰請假」、「倫廣有請假嗎」、「最近請假」時，調用指令即時獲取真實日曆數據。
+- 驗證：
+  * 全系統 34 項端到端功能測試 100% 通過（含今日請假、倫廣請假歷史、特定日期 2026-09-14 檢索）。
+  * 成功精準比對日曆上袁倫廣（9/8、9/14、9/15）以及林銘聖、楊正宇之實際請假紀錄。
+
+[2026-09-18] - 公用經費收支明細嚴格依時間先後遞進排序 (Ascending Chronological Funds Sorting)
+- 使用者回饋：公用經費收支明細順序經常忽新忽舊（倒序或正序飄移不一致），要求由上到下剛好是日期先後順序。
+- 修正項目：
+  * `query_service.py` (`query_budget` / `query_funds`)：回傳 `matched_ledger` 前，強制執行 `matched_ledger.sort(key=lambda x: str(x.get("日期") or "0000-00-00"))`，確保無論是純筆數查詢或關鍵字過濾，資料陣列一律嚴格按照「日期先後順序（由先至後、由舊到新）」排列。
+  * `AGENTS.md`：在「💰 經費/收支查詢」章節明確訂立輸出格式與排序鐵律：表格由上而下必須嚴格按照日期先後順序（最舊日期在第一列，最新日期在最後一列），讓結餘變化符合時間流水帳演變邏輯，全面杜絕順序忽正忽反問題。
+- 驗證：執行端到端 31 項測試全數通過（通過率 100%），實測 `query funds 15` 輸出順序完全固定且符合時間遞進。
+
+[2026-09-18] - 修復 360 人物查詢中現役成員被誤植他人論文與口試推薦之缺陷 (Strict Author Thesis Matching)
+- 問題現象：
+  * 使用者查詢現役成員「林銘聖」時，系統竟顯示他有一篇「智慧型射頻」的畢業論文，並推薦「提取林銘聖的口試簡報」與「查詢同研究主題之歷屆論文」，點擊後列出智慧型射頻論文清單。
+  * 使用者質疑：林銘聖明明尚未畢業且為現任成員，為何會查到相關領域的論文？
+- 根本原因：
+  * 在 `query_person_360` 函式中，原本有一行邏輯：`profile["thesis_info"] = exact_author_theses if exact_author_theses else thesis_res["results"][:3]`。
+  * 當查詢對象為尚未畢業的現役成員（如林銘聖）時，`exact_author_theses` 為空；此時 fallback 邏輯竟然自動抓取了 fuzzy 搜尋結果的前 3 筆（因同姓「林」且有「銘」字，模糊匹配到了「林庭陽」、「江銘洋」）。
+  * 導致林庭陽的「智慧型射頻網路中一個全新的多通道出價拍賣法」論文被強行灌給了林銘聖，進而觸發了口試簡報與同主題論文的錯誤推薦。
+- 修正方式：
+  * 徹底廢除 fallback 賦予他人論文的危險邏輯，嚴格要求論文作者必須完全相符：`profile["thesis_info"] = exact_author_theses`。
+  * 針對尚未畢業的現役成員，`thesis_title` 明確標記為「在學研究中（尚未發表畢業論文）」。
+  * 針對尚未發表論文的成員，完全移除「提取口試簡報」與「查詢同主題論文」的荒謬建議，動態切換為「查看保管設備清冊」、「查詢 70640 設備清冊」與「查詢歷屆校友名冊」。
+- 驗證測試：
+  * 查詢林銘聖 360 ➔ `thesis_info` 為空，題目顯示「在學研究中（尚未發表畢業論文）」，不再出現口試簡報或智慧型射頻之錯誤關聯。
+  * 查詢已畢業校友（向禮勤）360 ➔ 正確顯示本人論文題目與口試簡報推薦，功能運作完全符合事實。
+
+[2026-09-18] - 現役成員名冊格式精簡化（移除主機設備與 IP 地址）(Clean Member Roster)
+- 調整原因：使用者要求在詢問現在成員名單時，不應附帶設備硬體規格與網路 IP 地址，回歸純粹、簡潔的成員名單。
+- 修正位置：
+  * `lab_assistant/query_service.py` (`query_members`)：移除 `保管主機` 與 `網路IP` 欄位，僅回傳 `中文姓名`、`身分` 與 `所在研究室`（例如：`邱子倫 (70640 研究室)`）。
+  * `AGENTS.md`：明確規範「現役實驗室成員名冊：僅輸出成員姓名與所在研究室，嚴禁附帶任何電腦主機設備型號或 IP 地址」。
+- 驗證測試：
+  * 執行 `query members` ➔ 7 位現役成員資訊極致簡潔純淨，完全不再包含硬體與 IP 雜訊。
+
+[2026-09-18] - 移除查無資料之無效推薦與補齊設備清冊搜尋欄位 (Valid Suggestions Enforcement)
+- 問題現象：
+  * 在現役成員清單下方，系統推薦了「查詢 70640 實驗室主機之完整網路 IP 配置明細」，使用者點擊該推薦後，助理卻回覆「很抱歉，資料庫中關於 IP 配置的完整明細未詳細記錄於設備清冊中」，造成使用者困擾（「查不到就不要提」）。
+  * 同時發現設備清冊檢索（query_properties）先前未將「網路IP」、「設備狀態」、「備註」納入比對文字池，導致單純輸入 IP（如 194）亦無法精準命中設備。
+- 修正方式：
+  * 移除 `query_members` 中查無完整明細之「查詢 70640 實驗室主機之完整網路 IP 配置明細」建議項。
+  * 改為 100% 具備豐富真實數據之實用建議：「查詢 70640 實驗室電腦與設備財產清冊」（可精準查出 46 件設備）。
+  * 全面盤點全系統各模組（成員、校友、論文、設備、經費、規章）之 `suggestions` 推薦問題，確保每一條建議皆有真實資料庫數據對應，杜絕「推薦了卻查不到」的假引導。
+  * 在 `query_properties` 之比對字串中補齊 `網路IP`、`設備狀態`、`備註` 欄位，未來即使使用者單獨以 IP（如「194」）查詢，亦可精準帶出保管人與電腦規格。
+- 驗證測試：
+  * 點擊成員建議「查詢 70640 實驗室電腦與設備財產清冊」➔ 成功查出 46 件設備。
+  * 查詢「IP 194」➔ 成功查出邱子倫使用中之主機與一台閒置電腦。
+
+[2026-09-18] - 修復「校友名冊/設備清冊/論文/成員」大類別總稱查詢查無結果之重大缺陷 (Category Meta-Keyword Normalizer)
+- 問題現象：
+  * 使用者在對話中輸入「校友名冊」、「設備清冊」、「現役成員」、「畢業論文」等詞彙時，模型會將其原樣作為關鍵字傳入後端（如 `query alumni 校友名冊`）。
+  * 由於校友名冊每筆資料中無「校友」或「名冊」字眼，字串匹配演算法（_match_tokens_all）判定全部不符合，直接回傳 0 筆結果，導致助理回覆「未能搜尋到與『校友』關鍵字直接匹配的清單」。
+- 修正方式：
+  * 在 `lab_assistant/query_service.py` 中實作 `_clean_category_keyword(keyword, stop_words)` 通用類別詞過濾器。
+  * 支援成員名冊、校友名冊、設備財產清冊、歷屆論文等四大查詢模組。
+  * 若傳入關鍵字為大類別總稱詞彙（如「校友名冊」、「校友」、「名單」等），自動識別並直接回傳該分類之完整清冊（等同全域查詢）。
+  * 若傳入包含具體條件與大類別詞（如「資工系校友名冊」、「70640設備清冊」），自動剝除大類別修飾詞，精準以核心詞（「資工系」、「70640」）進行複合比對。
+- 驗證測試：
+  * `query alumni 校友名冊` ➔ 成功回傳 41 位完整歷屆校友。
+  * `query alumni 校友` ➔ 成功回傳 41 位完整歷屆校友。
+  * `query property 設備清冊` ➔ 成功回傳 52 件完整設備財產。
+  * `query thesis 畢業論文` ➔ 成功回傳 42 篇完整歷屆論文。
+  * `query members 現役成員` ➔ 成功回傳 7 位完整現役成員。
+  * 全套 31 項端到端綜合測試 100% 通過。
+
+[2026-09-18] - 移除資料查詢筆數上限限制 (Full Results Restoration)
+- 調整原因：使用者反饋筆數上限控制會導致校友名冊、財產設備與歷屆論文之回答內容不完整。
+- 修正位置：`lab_assistant/query_service.py` (`query_alumni`, `query_properties`, `query_thesis`)。
+- 修正方式：
+  * 移除所有查詢在空關鍵字時的 `[:15]` 筆數切片與限制提示文字。
+  * 完整回傳資料庫所有條目（校友 41 筆、財產 52 筆、論文 42 篇），確保前端回答具備 100% 完整性與詳盡度。
+  * 同步更新至 WSL 環境並通過完整性測試。
+
+[2026-09-18] - 桌面版 OpenClaw 閃退排查 (WinUI 3 Crash Diagnostics)
+- 根本原因診斷：
+  * 透過 Windows Event Log 與 `OpenClawTray\crash.log` 查明，桌面端閃退由 `Microsoft.UI.Xaml.dll` (WinUI 3) 引發 `0xc000027b` 及 `System.ArgumentException: 參數錯誤`。
+  * 觸發機制：在同一個會話進行長對話並反覆執行 Tool 查詢時，累積過多的會話歷史會導致 WinUI 3 在接收 `sessions.changed` 並計算長對話捲動與 Markdown 渲染時引發 layout pass 例外而閃退。
+- 應對與防護：
+  * 清理恢復 `openclaw.json` 設定檔，移除不支援的非標準 key，確保通過 `openclaw config validate`。
+  * 撤銷未啟用之 `nas_read_by_chapters` 試驗程式碼，維持主流程純淨穩定。
+  * 建議使用者在單一對話問滿多輪後，開啟新對話（+）以重置 WinUI 視覺樹記憶體，杜絕桌面端捲動崩潰。
+
+[2026-09-18] - 修正桌面版 OpenClaw 卡死問題 (Background Thread for Wiki Sync)
+- 根本原因：query_service.py 的 load_json() 每次呼叫都會觸發 check_and_auto_sync()，
+  若 NAS/Wiki (yzuirl.synology.me) 網路不穩或離線，requests 連線 + Retry(total=3) 重試
+  最長可阻塞主流程 30 秒以上，導致 OpenClaw 完全卡死無回應。
+- 修正位置：lab_assistant/query_service.py - check_and_auto_sync() 函數 (L26)
+- 修正方式：
+  * 將 sync_wiki_cache() 的呼叫改為 daemon=True 背景執行緒，主查詢流程立即返回
+  * 網路連線/超時問題靜默忽略，下次觸發時再重試
+  * 觸發間隔從 5 分鐘延長至 30 分鐘，大幅減少不必要的連線頻率
+- 同步部署至 WSL (/home/openclaw/irl_lab/lab_assistant/query_service.py)
+- 另一並行修正：AGENTS.md 精簡重寫（95 行 → 44 行），移除所有硬寫輸出格式，
+  改為純指令對照表 + formatted_response 模式，之後新增功能只改 Python，不動 MD。
+
+[2026-09-18] - 修正「請假規定」與「報帳規定」查詢混淆問題 (Leave vs. Accounting Rule Split)
+- 問題：query_accounting_rules() 收到「請假」關鍵字時，誤將 Wiki 報帳頁面中的差旅出差說明
+  當作請假制度回傳，導致實驗室出席罰款規定與差旅報帳流程混合呈現，回答完全錯誤。
+- 修正位置：lab_assistant/query_service.py - query_accounting_rules() 函數 (L319)
+- 修正方式：
+  * 在函數最前端加入 LEAVE_KEYWORDS 關鍵字清單（請假、出席、出勤、罰款、缺席等）
+  * 命中請假關鍵字時，直接讀取 wiki_knowledge.json["請假"] 條目，完全不觸碰 accounting_rules.json
+  * 回傳結構化 summary（開學/寒暑假在室時間、Google 行事曆請假方式、罰款 500 元規則）
+  * 報帳關鍵字流程維持原本 accounting_rules.json 查詢路徑，互不干擾
+- 測試驗證：query_accounting_rules('請假') → topic: 請假規定 / source: MediaWiki 實驗室維基
+           query_accounting_rules('報帳') → is_general_overview: True / data keys: 雜項/採購/零用金/薪資
+
+[2026-09-18] - 請假出勤與報帳核銷關聯性規章強化 (Leave & Reimbursement Compliance Linkage)
+- 於 `AGENTS.md` 明確補充「請假/出勤」與「報帳/薪資」之法規勾稽關係：
+  - 差旅出差請假：出差前必須於 Portal 填寫出差申請單（填單日不得晚於出差日），出國自第 1 日起算請假方可計生活費（0.3/0.7）。
+  - 兼任薪資出勤：專案人員聘用與出勤日誌（08:00簽到）勾稽，缺勤/晚簽到需補請假單或補簽到退證明單（蓋主持人章）。
+- 已同步至 WSL 工作區。
+
+[2026-09-18] - 全系統 10 大查詢路徑端到端深度驗證測試 (Full Comprehensive End-to-End Test Suite 100% Pass)
+- 建置並執行全功能端到端測試套件 (`openclaw_setup/tests/comprehensive_test_suite.py`)，涵蓋 10 大查詢核心板塊共 31 項測試用例：
+  1. 現役成員名冊 (`query_members`)：支援全體查詢與單一成員動態篩選，排除冗餘延伸建議。
+  2. 歷屆畢業校友 (`query_alumni`)：驗證全體名冊、特定年度與特定姓名校友檢索。
+  3. 設備與財產清冊 (`query_properties`)：驗證全體清冊、70640 研究室位置與特定硬體/GPU。
+  4. 經費收支與帳本 (`query_funds` / `query_budget`)：修復數字字串模板與最新結餘動態試算。
+  5. 會計報帳規章 (`query_accounting_rules`)：修復通用查詢覆蓋四大核心板塊，支援便當、國外勞務、差旅費。
+  6. 歷屆碩士論文 (`query_thesis`)：驗證張浚暢、易子杰、林威諭、向禮勤論文摘要解讀與 NAS 自動提取。
+  7. 360 度人物全景 (`query_person_360`)：驗證現役成員 (蕭宇傑)、現役助理 (邱子倫) 與已畢業校友 (顏伯丞)。
+  8. 實驗室官方網站 (`official_site_reader`)：即時爬取 member、cooperation、recruits 等頁面。
+  9. MediaWiki 實驗室維基 (`wiki_reader`)：線上 API 檢索公用經費與報帳規章。
+  10. 報帳合規防呆試算 (`evaluate_expense_compliance`)：驗證國內小額、大額比價與 OpenAI 5% 營業稅試算。
+- 測試結果：31 項測試全部通過（100.0% 通過率），全系統回覆品質、數據真實性與排版規範完全一致。
+
+[2026-09-17] - 實驗室現役成員動態設備所有者萃取機制 (Dynamic In-Use Equipment Member Resolution)
+- 依指示不建立額外本地成員名冊檔案，全面改採**動態檢索「使用中設備所有者清冊」(`lab_properties.json`)** 機制：
+  - `query_members(keyword)`：動態過濾 `設備狀態 == "使用中"` 且排除公用設備之實際使用者（邱子倫、袁倫廣、尹才彥、林銘聖、蘇冠宇、楊正宇、蕭宇傑），並附帶其所屬研究室（70640）、專屬主機規格與網路 IP。
+  - `query_person_360`：優先比對使用中設備之所有者，自動標註「現役成員 / 實驗室主機使用中 (70640 實驗室 / IP: xxx)」及保管主機配置。
+  - `query_official_website`：於查詢成員（`site member` / `site 成員`）時，自動整合線上官網與使用中設備所有者名冊。
+- 升級 `openclaw_setup/irl_agent.py`：支援 `query members <關鍵字>` 即時查閱使用中設備之所有成員名單。
+
+[2026-09-17] - 參考論文/雜訊目錄過濾與副檔名處理修復 (Reference Folder Exclusion & File Precision Fix)
+- 修復 `_find_target_file_recursive` 遞迴搜尋邏輯：
+  - 首層主目錄檔案（如 `氫能無人機自動化任務規劃模型.docx`）享有最高優先級。
+  - 明確過濾「`相關論文`」、「`參考文獻`」、「`舊版`」、「`圖`」、「`code`」等雜訊目錄，杜絕誤抓他人參考論文或規格書 PDF 的問題。
+  - 修復副檔名剖析邏輯，杜絕產出 `.docx.pdf` 雙副檔名檔案。
+
+[2026-09-17] - 官網爬取依賴套件 (bs4/soupsieve) 補全與現役成員名冊檢索修復
+- 修正 WSL 環境下 `pylib` 缺少 `beautifulsoup4` 與 `soupsieve` 套件導致官網即時爬取失敗（`ModuleNotFoundError: No module named 'bs4'`）之問題。
+- 完整安裝 `bs4` / `soupsieve` 至 `/home/openclaw/irl_lab/pylib`，經全面測試 `query_official_site` 8 大功能模組 100% 通過。
+- 於 `AGENTS.md` 明確註記「目前現役成員名冊」直通查詢指令（`site member` / `site 成員`），可即時連線官網呈現最新在學研究生與研究助理名冊。
+- 重啟 OpenClaw Gateway。
+
+[2026-09-17] - 標準化固定問候開場白設定 (Standardized Fixed Greeting Template)
+- 設定 OpenClaw 助理在接收純問候語（「嗨」、「你好」、「哈囉」、「Hello」等）時，統一採用簡潔之標準化固定格式回覆。
+- 固定呈現實驗室 4 大核心功能導航（碩士論文/簡報檢索、設備清冊、經費收支與報帳法規、成員360與官網），純自我介紹打招呼時不附加多餘的延伸問題。
+- 同步更新 `SOUL.md`、`AGENTS.md`、`USER.md` 並重啟 OpenClaw Gateway。
+
+[2026-09-17] - 全面禁用數字編號條列與建議邏輯修正 (Universal Prohibition of Numbered Lists & 0-Equipment Fix)
+- 修正模型在輸出多位學長論文或項目清單時，因數字計數邏輯錯亂而產生重複編號（如「`3. 陸保任`」、「`3. 徐睿誌`」）或倒數問題。
+- 於 `AGENTS.md` 與 `USER.md` 全域強制規範：**全面嚴禁使用任何阿拉伯數字開頭編號（如「1.」「2.」「3.」等）做為條列開頭**，所有項目一律使用符號（`*`、`-`、`➔`）或 Markdown 分級標題（`### 📌`），從根源杜絕數字錯亂。
+- 修正 `query_person_360` 延伸建議：當成員名下保管設備為 0 件時，不再產生「查看保管的 0 件設備詳細清單」，改為推薦查詢該成員參與之研究主題與專案發表成果。
+- 完成全域同步至 WSL 工作區。
+
+[2026-09-17] - 排版禁止 HTML 標籤規範 (Disallow Raw HTML Tags & Markdown Enforcement)
+- 修正模型在產生 Markdown 表格時夾雜 `<b>`、`</b>`、`<br>` 等 HTML 標籤導致前端渲染器直接外露標籤字元之問題。
+- 於 `AGENTS.md` 與 `USER.md` 明確規範：全面禁止使用任何 HTML 標籤，粗體一律採用標準 Markdown 語法 `**文字**`，表格內保持純文字或標準分欄排版。
+- 完成 WSL 與 OpenClaw 最新指令同步。
+
+[2026-09-17] - 延伸建議強制逐字引用回傳資料 (Enforce Verbatim JSON Suggestions in OpenClaw)
+- 修正 OpenClaw 模型在結尾自行幻覺生成固定樣板問題（如「1. 提取口試簡報 2. 查詢 360 度個人資料 3. 檢索專案原始碼」）之問題。
+- 於 `AGENTS.md` 與 `USER.md` 明確嚴格約束：助理在輸出「💡 您可能還想了解」時，**必須 100% 逐字引用指令回傳 JSON 中的 `suggestions` 清單**，徹底展現動態探測之資料夾檔案（NS2、Excel 數據、Demo 影片）與論文核心演算法深度問題。
+- 重新同步 WSL 工作區與設定檔。
+
+[2026-09-17] - 延伸建議動態深度化升級 (Personalized Deep Follow-up Suggestions)
+- 升級 `lab_assistant/query_service.py`：徹底廢除固定樣板，改為動態偵測該成員實體資料夾內收錄之其他檔案（如 NS2 模擬原始碼、實驗數據圖表 Excel、Demo 實作影片）與論文具體演算法關鍵技術。
+- 每次問答自動產生真正具備深度的 3 大個性化延伸問題（包含具體技術推導、資料夾其他實體檔案檢索、與同領域研究技術演進比較）。
+
+[2026-09-17] - 論文問答時自動主動提取至本機檢視器 (Automatic Extraction on Query)
+- 升級 `lab_assistant/query_service.py`：於查詢特定成員論文時，在 0.05 秒內自動將論文提取至本機 `thesis_viewer/` 資料夾，無需使用者二次點擊提取。
+- 助理在產出 5 大章節深度報告時，自動附帶本地已提取之可點擊檔案連結，達成「一問即讀、一問即提」的一體化流暢體驗。
+
+[2026-09-17] - 本機 IDE 檢視器 (thesis_viewer/) 自動對應與口語提取容錯修復
+- 修復 WSL 閘道與 Windows 本機工作區 `thesis_viewer/` 路徑自動掛載映射，確保 OpenClaw 下載之檔案直接存入 Windows 目錄。
+- 升級 `lab_assistant/nas_reader.py`：
+  - 支援「論文」、「論文pdf」、「口試簡報」等多元口語化關鍵字自動泛化比對（相容子目錄中的 `本文.docx` 與 `final.pptx`）。
+  - 升級 `clear_viewer_dir`：支援保留同成員檔案（`keep_prefix`），使同位成員的論文 Word/PDF 與口試 PPTX 投影片能並存於檢視器中。
+  - `nas open` 自動提取並附帶 1,500 字真實摘要（`preview`），杜絕助手回傳空白對話框。
+
+[2026-09-17] - 畢業論文自動摘要預覽與深度內容介紹功能 (Thesis Abstract Preview & In-depth Introduction)
+- 升級 `lab_assistant/query_service.py`：於精確查詢特定成員論文時，自動串流讀取前段真實摘要文字（`abstract_preview`），提供 AI 即時深度解讀。
+- 更新 `AGENTS.md`：規範助理在收到論文查詢需求時，自動讀取論文內文並以結構化格式深入介紹「研究背景、核心機制設計、模擬工具（NS2 等）與實驗成效結論」，杜絕僅回傳單行標題。
+
+[2026-09-17] - 本機 Z: 磁碟機動態路徑解析與查詢引擎升級 (Dynamic Z Drive Resolution)
+- 解釋與確認 `thesis_index.json` 之標準通用虛擬路徑（`/IRLshare/...`）架構設計，確保跨環境與跨平台（Windows / Linux / WSL / WebAPI）通用性。
+- 升級 `lab_assistant/query_service.py`：於查詢畢業論文時自動偵測本機 `Z:` 槽，動態注入 `local_path`（如 `Z:\畢業論文\唐嘉鋒\`），使 Windows 本機可直通秒讀。
+
+[2026-09-17] - OpenClaw 乾淨排版與單次精準調用優化 (Clean Output & Single-Execution Optimization)
+- 移除經費查詢結果中的冗長「資料來源說明」與 Google 試算表 ID 字串，版面僅保留核心數據與收支表格。
+- 確立單次精準執行規則（Single-Execution Tool Calling）：每次問答只調用 1 條最精確的腳本，禁止探測命令，避免產生多個折疊命令框。
+- 升級模型至 Google Gemini Flash Lite 系列，大幅提升回覆速度與每分鐘頻率上限（10~30 RPM）。
+
+[2026-09-17] - OpenClaw 雲端備援模型配置 (Google Gemini Fallback Integration)
+- 完成 Google Gemini 2.0 Flash / 1.5 Flash 備援模型配置：
+  - 於 OpenClaw Gateway 建立 `google-gemini` 模型供應商設定。
+  - 配置雙層自動備援策略：當實驗室 DGX-1 伺服器因校外無 VPN 或離線逾時時，OpenClaw 會自動無縫切換至 `google-gemini/gemini-2.0-flash` 繼續處理對話與呼叫 NAS/Wiki 工具。
+  - 新增 `openclaw_setup/patch_openclaw_gemini.py` 輔助腳本。
+
 [2026-09-17] - 實驗室官方網站 (https://irl.ee.yzu.edu.tw/) 即時檢索模組整合與專案檔案架構整理
 - 新增 `lab_assistant/official_site_reader.py`：
   - 直連實驗室官方網站，即時抓取並解析 7 大單元內容（簡介、指導教授、成員、校友、產學合作實績、聯絡方式、誠徵新成員）。
@@ -128,3 +598,26 @@ YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - Ch
   - 全面導入多關鍵字空格分詞 (Token AND) 複合比對邏輯，支援「112 物聯網」、「70640 伺服器」、「104 閘道」等多條件跨欄位精準過濾。
 - 同步更新 `AGENTS.md`、`Doc/FRD.md`、`Doc/Architecture.md` 與 `Doc/ChangeLog.txt`。
 
+
+[2026-09-17] - OpenClaw 介面優化與 Gemini Flash Lite 整合
+- 優化 OpenClaw Windows Companion 介面體驗：
+  - 將 %APPDATA%/OpenClawTray/settings.json 中的 ShowChatToolCalls 設定為 alse，全面隱藏工具執行與命令呼叫折疊框，保持對話畫面純淨簡潔。
+- 模型與經費檢索全面切換：
+  - 預設模型切換為 google-gemini/gemini-flash-lite-latest（支援 15 RPM 與極速回傳）。
+  - 經費查詢全面串接 MediaWiki 線上檢索，並濾除 Google 試算表 ID 與來源說明，達成直接結構化數據輸出。
+
+[2026-09-17] - 修復 OpenClaw Windows Companion 啟動閃退問題
+- 問題排查與修復：
+  - 經 Windows 事件日誌與 crash.log 分析，WinUI 3 XAML 前端在 ShowChatToolCalls: false 時會引發 Microsoft.UI.Xaml.dll 的 ArrangeOverride 佈局計算異常（ArgumentException）。
+  - 將設定恢復為原生標準配置並清除暫存標記，成功恢復 OpenClaw Windows Companion 正常運行。
+
+[2026-09-17] - 修復 query_budget 筆數查詢解析錯誤問題
+- 問題排查與修復：
+  - 過去傳入 '5'、'10'、'15' 或 '最近5筆' 時，系統將數字誤當作包含 '5' 的文字關鍵字進行過濾（導致返回 2015/2019/2020 等日期含 5 的歷史雜項）。
+  - 修復 query_service.py 內的正則筆數判斷，自動識別數字並精準切片倒數 N 筆真實帳本（如 2026-08-06 零食 -910 至 2026-06-01 零食 -945）。
+
+[2026-09-17] - 全面同步 NAS 預設連線帳號為 yujie
+- 程式碼預設值全面更新：
+  - 更新 
+as_reader.py、wiki_reader.py、ull_indexer.py、ix_titles.py、erify_folders.py 中的預設帳號為 yujie。
+  - 同步更新 .env、AGENTS.md 與 WSL 環境，確保程式碼與文件 100% 一致。

@@ -29,8 +29,9 @@ if sys.platform == "win32":
         pass
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-ENV_PATH = os.path.join(CURRENT_DIR, '.env')
-WIKI_CACHE_PATH = os.path.join(CURRENT_DIR, 'data', 'wiki_knowledge.json')
+BASE_DIR = os.path.dirname(CURRENT_DIR) if os.path.basename(CURRENT_DIR) in ('connectors', 'core') else CURRENT_DIR
+ENV_PATH = os.path.join(BASE_DIR, '.env')
+WIKI_CACHE_PATH = os.path.join(BASE_DIR, 'data', 'wiki_knowledge.json')
 WIKI_API_URL = "https://yzuirl.synology.me/mediawiki/api.php"
 
 # 快取 Wiki Session
@@ -50,7 +51,7 @@ def get_wiki_session():
     session.mount('https://', HTTPAdapter(max_retries=retries))
 
     env = dotenv_values(ENV_PATH)
-    user = env.get("NAS_USERNAME", "蕭宇傑")
+    user = env.get("NAS_USERNAME", "yujie")
     pwd = env.get("NAS_PASSWORD", "Xiao921204@")
 
     try:

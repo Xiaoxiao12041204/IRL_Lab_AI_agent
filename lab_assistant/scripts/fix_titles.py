@@ -46,7 +46,7 @@ def get_nas_credentials():
     host = env_vars.get('NAS_HOST', 'https://yzuirl.synology.me:5001')
     if not host.startswith('http'):
         host = 'https://' + host
-    return host, env_vars.get('NAS_USERNAME', '蕭宇傑'), env_vars.get('NAS_PASSWORD', 'Xiao921204@')
+    return host, env_vars.get('NAS_USERNAME', 'yujie'), env_vars.get('NAS_PASSWORD', 'Xiao921204@')
 
 def extract_title_from_text(text, author):
     lines = [l.strip() for l in text.split('\n') if l.strip()]

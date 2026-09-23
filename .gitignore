@@ -21,3 +21,10 @@ Thumbs.db
 # 檢視器動態下載暫存（維護無痕原則）
 lab_assistant/thesis_viewer/*
 !lab_assistant/thesis_viewer/.gitkeep
+
+# 敏感金鑰與服務帳戶憑證（資安防護）
+lab_assistant/credentials/
+credentials/
+*.pem
+*.key
+*service_account*.json

@@ -28,7 +28,7 @@ def get_nas_credentials():
     host = env_vars.get('NAS_HOST', 'https://yzuirl.synology.me:5001')
     if not host.startswith('http'):
         host = 'https://' + host
-    username = env_vars.get('NAS_USERNAME', '蕭宇傑')
+    username = env_vars.get('NAS_USERNAME', 'yujie')
     password = env_vars.get('NAS_PASSWORD', 'Xiao921204@')
     return host, username, password
 
