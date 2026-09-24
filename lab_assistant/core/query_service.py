@@ -992,53 +992,63 @@ def query_leaves(keyword=""):
         import re
 
         raw_kw = str(keyword).strip()
-        
-        # 1. 判斷是否為「今天」、「今日」或空字串
-        if not raw_kw or raw_kw in ("今天", "今日", "today", "現在", "目前"):
+        kw_norm = raw_kw.lower().replace(" ", "").replace("_", "").replace("-", "")
+
+        # 1. 判斷精準週範圍 (這禮拜, 這週, 本週, thisweek, week, etc.)
+        THIS_WEEK_KW = [
+            "這禮拜", "本禮拜", "這週", "本週", "這星期", "本星期", "這個禮拜", "這個星期",
+            "這個週", "這周", "本周", "今週", "今周", "thisweek", "currentweek", "week"
+        ]
+        NEXT_WEEK_KW = ["下禮拜", "下個禮拜", "下週", "下周", "下個週", "下個周", "下星期", "下個星期", "nextweek"]
+        LAST_WEEK_KW = ["上禮拜", "上個禮拜", "上週", "上周", "上個週", "上個周", "上星期", "上個星期", "lastweek", "prevweek"]
+        TWO_WEEKS_KW = ["兩週", "2週", "雙週", "近兩週", "這兩週", "twoweeks", "2weeks"]
+
+        if any(w in kw_norm for w in NEXT_WEEK_KW):
+            res = google_calendar_reader.get_week_leaves(week_offset=1)
+            res["query_type"] = "week_range"
+            res["suggestions"] = ["查詢這禮拜誰請假", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        if any(w in kw_norm for w in LAST_WEEK_KW):
+            res = google_calendar_reader.get_week_leaves(week_offset=-1)
+            res["query_type"] = "week_range"
+            res["suggestions"] = ["查詢這禮拜誰請假", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        if any(w in kw_norm for w in TWO_WEEKS_KW):
+            res = google_calendar_reader.get_recent_leaves(days_back=7, days_forward=7)
+            res["query_type"] = "two_weeks_range"
+            res["suggestions"] = ["查詢這禮拜誰請假", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        if any(w in kw_norm for w in THIS_WEEK_KW) or ("禮拜" in kw_norm) or ("星期" in kw_norm) or ("週" in kw_norm and "兩週" not in kw_norm) or ("周" in kw_norm and "兩周" not in kw_norm):
+            res = google_calendar_reader.get_week_leaves(week_offset=0)
+            res["query_type"] = "week_range"
+            res["suggestions"] = ["查詢今天誰請假", "查詢下禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        # 2. 判斷是否為「今天」、「今日」、相對日（明天、昨天）或無明確時間之問句（誰請假、有誰請假）
+        if not raw_kw or kw_norm in ("今天", "今日", "today", "現在", "目前", "誰請假", "有誰請假", "誰有請假", "誰", "who"):
             res = google_calendar_reader.get_today_leaves()
             res["query_type"] = "today"
             res["suggestions"] = ["查詢這禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣、林銘聖)", "查詢實驗室缺席罰款與請假規定"]
             return res
 
-        # 1.1 判斷相對日期 (明天、昨天)
-        if raw_kw in ("明天", "明日", "tomorrow"):
+        if kw_norm in ("明天", "明日", "tomorrow"):
             target_date = datetime.date.today() + datetime.timedelta(days=1)
             res = google_calendar_reader.get_today_leaves(target_date)
             res["query_type"] = "specific_date"
             res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢實驗室出勤規定"]
             return res
 
-        if raw_kw in ("昨天", "昨日", "yesterday"):
+        if kw_norm in ("昨天", "昨日", "yesterday"):
             target_date = datetime.date.today() - datetime.timedelta(days=1)
             res = google_calendar_reader.get_today_leaves(target_date)
             res["query_type"] = "specific_date"
             res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢實驗室出勤規定"]
             return res
 
-        # 1.2 判斷精準週範圍查詢 (這禮拜、本週、下禮拜、上禮拜等)
-        THIS_WEEK_KW = ["這禮拜", "本禮拜", "這週", "本週", "這星期", "本星期", "這個禮拜", "這個星期", "這個週", "這周", "本周"]
-        NEXT_WEEK_KW = ["下禮拜", "下個禮拜", "下週", "下周", "下星期", "下個星期"]
-        LAST_WEEK_KW = ["上禮拜", "上個禮拜", "上週", "上周", "上星期", "上個星期"]
-
-        if any(w in raw_kw for w in THIS_WEEK_KW):
-            res = google_calendar_reader.get_week_leaves(week_offset=0)
-            res["query_type"] = "week_range"
-            res["suggestions"] = ["查詢今天誰請假", "查詢下禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣)"]
-            return res
-
-        if any(w in raw_kw for w in NEXT_WEEK_KW):
-            res = google_calendar_reader.get_week_leaves(week_offset=1)
-            res["query_type"] = "week_range"
-            res["suggestions"] = ["查詢這禮拜誰請假", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
-            return res
-
-        if any(w in raw_kw for w in LAST_WEEK_KW):
-            res = google_calendar_reader.get_week_leaves(week_offset=-1)
-            res["query_type"] = "week_range"
-            res["suggestions"] = ["查詢這禮拜誰請假", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
-            return res
-
-        # 2. 判斷是否為完整特定年月日 (例如 2026-09-14, 2026/09/14, 9-14, 9/14, 9月14日)
+        # 3. 判斷是否為完整特定年月日 (例如 2026-09-14, 2026/09/14, 9-14, 9/14, 9月14日)
         m_full_date = re.search(r'(?:(\d{4})[-/年])?(\d{1,2})[-/月](\d{1,2})日?', raw_kw)
         if m_full_date:
             year = int(m_full_date.group(1)) if m_full_date.group(1) else datetime.date.today().year
@@ -1053,7 +1063,7 @@ def query_leaves(keyword=""):
             except Exception:
                 pass
 
-        # 3. 判斷是否為「月份」格式 (例如 2026-09, 2026/09, 2026年9月, 9月)
+        # 4. 判斷是否為「月份」格式 (例如 2026-09, 2026/09, 2026年9月, 9月)
         m_month = re.search(r'^(?:(\d{4})[-/年])?(\d{1,2})月?$', raw_kw)
         if m_month:
             year = int(m_month.group(1)) if m_month.group(1) else datetime.date.today().year
@@ -1063,17 +1073,6 @@ def query_leaves(keyword=""):
                 res["query_type"] = "month_range"
                 res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢實驗室出勤規定"]
                 return res
-
-        # 4. 判斷是否為廣義範圍名冊查詢 (近兩週、近期、請假名冊、出勤紀錄等)
-        RANGE_KEYWORDS = [
-            "近", "兩週", "2週", "雙週", "最近", "近期", "名冊", "名單", "列表", "清冊", "全部", "所有", "這幾天", "紀錄", "記錄", "出勤",
-            "all", "range", "recent", "list", "leaves", "who", "history", "更多", "不只", "其他人", "還有誰", "還有"
-        ]
-        if any(w in raw_kw.lower() for w in RANGE_KEYWORDS):
-            res = google_calendar_reader.get_recent_leaves(days_back=21, days_forward=14)
-            res["query_type"] = "recent_range"
-            res["suggestions"] = ["查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)", "查詢實驗室出勤規定"]
-            return res
 
         # 5. 成員比對：只有命中真實成員名冊時才進入 member_check
         KNOWN_MEMBERS = ["邱子倫", "子倫", "袁倫廣", "倫廣", "尹才彥", "才彥", "林銘聖", "銘聖", "楊正宇", "正宇", "蘇冠宇", "冠宇", "蕭宇傑", "宇傑"]
@@ -1093,20 +1092,20 @@ def query_leaves(keyword=""):
 
         if target_member:
             res = google_calendar_reader.check_member_leave(target_member)
-            recent = google_calendar_reader.get_recent_leaves(days_back=30, days_forward=30)
+            recent = google_calendar_reader.get_recent_leaves(days_back=14, days_forward=14)
             member_history = [
                 l for l in recent.get("leaves", []) 
                 if target_member in l["title"] or any(part in l["title"] for part in [target_member[-2:], target_member])
             ]
             res["query_type"] = "member_check"
             res["history_leaves"] = member_history
-            res["suggestions"] = ["查詢今天全體請假名單", "查詢近兩週所有請假名冊", f"查詢 {target_member} 保管之設備清冊"]
+            res["suggestions"] = ["查詢今天全體請假名單", "查詢這禮拜請假名冊", f"查詢 {target_member} 保管之設備清冊"]
             return res
 
-        # 6. 若以上皆未匹配，回傳近兩週所有請假紀錄（避免落空）
-        res = google_calendar_reader.get_recent_leaves(days_back=21, days_forward=14)
+        # 6. 廣義近期名冊查詢 fallback (近兩週~一個月)
+        res = google_calendar_reader.get_recent_leaves(days_back=14, days_forward=14)
         res["query_type"] = "recent_range"
-        res["suggestions"] = ["查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)", "查詢實驗室出勤規定"]
+        res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣)"]
         return res
 
     except Exception as e:
