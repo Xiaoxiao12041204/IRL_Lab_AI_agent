@@ -36,9 +36,9 @@
             │     │     ➔ 涵蓋簡介、指導教授、成員、校友、產學實績、聯絡方式、招募等 7 大單元
             │     │     ➔ 支援 12 小時快取與線上即時爬取
             │     │
-            │     ├── Google Calendar 實驗室行事曆連動引擎 (google_calendar_reader.py)
+            │     ├── Google Calendar 實驗室行事曆連動引擎 (google_calendar_reader.py & query_service.py)
             │     │     ➔ 串接 Google Calendar REST API (Service Account)
-            │     │     ➔ 📅【成員請假與出勤】即時查詢今日請假、近期名冊、特定日期與時段，精準單週（這禮拜/本週/下週/上週）範圍（get_week_leaves），支援 AI 自然語言登記寫入與取消刪除
+            │     │     ➔ 📅【成員請假與出勤】即時查詢今日請假、近期名冊、特定日期與時段，精準單週/月度範圍檢索；支援姓名錯字/別字/同音字智慧自動校正（normalize_member_name），嚴格遵循歷史慣例格式（標題為兩字習慣稱呼如銘聖、時段預設 10:00~17:00）進行 AI 自然語言登記寫入與取消刪除
             │     │
             │     ├── Google Sheets 雲端即時雙向記帳引擎 (sheets_writer.py)
             │     │     ➔ 串接 Google Sheets REST API (Service Account 授權憑證)

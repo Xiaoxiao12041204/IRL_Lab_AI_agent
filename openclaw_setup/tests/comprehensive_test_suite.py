@@ -211,6 +211,15 @@ def main():
              validator=lambda r: (r.get("status") == "success" and "leaves" in r, "特定日期請假查詢失敗"))
     run_test("11. Google日曆請假查詢", "單週請假查詢 ('這禮拜有誰請假')", query_service.query_leaves, ("這禮拜有誰請假",),
              validator=lambda r: (r.get("status") == "success" and r.get("query_type") == "week_range" and " ~ " in r.get("range", ""), "單週請假查詢失敗"))
+    run_test("11. Google日曆請假查詢", "相對月份請假查詢 ('上個月呢')", query_service.query_leaves, ("上個月呢",),
+             validator=lambda r: (r.get("status") == "success" and r.get("query_type") == "month_range" and r.get("count", 0) > 0, "上個月請假查詢失敗"))
+    run_test("11. Google日曆請假查詢", "特定月份請假查詢 ('8月份')", query_service.query_leaves, ("8月份",),
+             validator=lambda r: (r.get("status") == "success" and r.get("query_type") == "month_range" and r.get("count", 0) == 10, "8月份請假查詢失敗"))
+    run_test("11. Google日曆請假查詢", "成員錯字自動校正查詢 ('林銘璽')", query_service.query_leaves, ("林銘璽",),
+             validator=lambda r: (r.get("status") == "success" and r.get("member") == "銘聖", "錯字校正查詢失敗"))
+    import google_calendar_reader
+    run_test("11. Google日曆請假查詢", "姓名標準化函數驗證 ('政宇')", google_calendar_reader.normalize_member_name, ("政宇",),
+             validator=lambda r: (r.get("display_name") == "正宇" and r.get("was_corrected") == True, "標準化函數失敗"))
 
     print("=" * 70)
     total_tests = len(test_results)

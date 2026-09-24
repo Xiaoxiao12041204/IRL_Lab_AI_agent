@@ -227,9 +227,226 @@ def get_month_leaves(year: int, month: int) -> Dict[str, Any]:
         "leaves": leaves
     }
 
+# 實驗室現役成員正式全名與日曆慣用兩字簡稱對照表
+LAB_MEMBERS = {
+    "邱子倫": "子倫",
+    "袁倫廣": "倫廣",
+    "尹才彥": "才彥",
+    "林銘聖": "銘聖",
+    "楊正宇": "正宇",
+    "蘇冠宇": "冠宇",
+    "蕭宇傑": "宇傑",
+}
+
+# 常見錯字、別字、同音字、別名對照表
+MEMBER_TYPO_MAP = {
+    # 林銘聖 (銘聖)
+    "銘璽": "銘聖",
+    "林銘璽": "銘聖",
+    "銘勝": "銘聖",
+    "林銘勝": "銘聖",
+    "明聖": "銘聖",
+    "林明聖": "銘聖",
+    "明勝": "銘聖",
+    "林明勝": "銘聖",
+    "銘盛": "銘聖",
+    "林銘盛": "銘聖",
+    "銘笙": "銘聖",
+    "林銘笙": "銘聖",
+    "銘慎": "銘聖",
+    "林銘慎": "銘聖",
+    "林銘": "銘聖",
+    "銘聖": "銘聖",
+    "林銘聖": "銘聖",
+
+    # 楊正宇 (正宇)
+    "政宇": "正宇",
+    "楊政宇": "正宇",
+    "正雨": "正宇",
+    "楊正雨": "正宇",
+    "政雨": "正宇",
+    "楊政雨": "正宇",
+    "正羽": "正宇",
+    "楊正羽": "正宇",
+    "震宇": "正宇",
+    "楊震宇": "正宇",
+    "振宇": "正宇",
+    "楊振宇": "正宇",
+    "正語": "正宇",
+    "楊正語": "正宇",
+    "正宇": "正宇",
+    "楊正宇": "正宇",
+
+    # 袁倫廣 (倫廣)
+    "倫光": "倫廣",
+    "袁倫光": "倫廣",
+    "輪廣": "倫廣",
+    "袁輪廣": "倫廣",
+    "輪光": "倫廣",
+    "袁輪光": "倫廣",
+    "綸廣": "倫廣",
+    "袁綸廣": "倫廣",
+    "倫廣": "倫廣",
+    "袁倫廣": "倫廣",
+
+    # 邱子倫 (子倫)
+    "子輪": "子倫",
+    "邱子輪": "子倫",
+    "子綸": "子倫",
+    "邱子綸": "子倫",
+    "梓倫": "子倫",
+    "邱梓倫": "子倫",
+    "紫倫": "子倫",
+    "邱紫倫": "子倫",
+    "子倫": "子倫",
+    "邱子倫": "子倫",
+
+    # 尹才彥 (才彥)
+    "采彥": "才彥",
+    "尹采彥": "才彥",
+    "彩彥": "才彥",
+    "尹彩彥": "才彥",
+    "才宴": "才彥",
+    "尹才宴": "才彥",
+    "才諺": "才彥",
+    "尹才諺": "才彥",
+    "才硯": "才彥",
+    "尹才硯": "才彥",
+    "才彥": "才彥",
+    "尹才彥": "才彥",
+
+    # 蘇冠宇 (冠宇)
+    "冠羽": "冠宇",
+    "蘇冠羽": "冠宇",
+    "冠雨": "冠宇",
+    "蘇冠雨": "冠宇",
+    "冠語": "冠宇",
+    "蘇冠語": "冠宇",
+    "冠禹": "冠宇",
+    "蘇冠禹": "冠宇",
+    "冠宇": "冠宇",
+    "蘇冠宇": "冠宇",
+
+    # 蕭宇傑 (宇傑)
+    "宇杰": "宇傑",
+    "蕭宇杰": "宇傑",
+    "蕭蕭": "宇傑",
+    "宇捷": "宇傑",
+    "蕭宇捷": "宇傑",
+    "雨傑": "宇傑",
+    "蕭雨傑": "宇傑",
+    "雨杰": "宇傑",
+    "蕭雨杰": "宇傑",
+    "宇潔": "宇傑",
+    "蕭宇潔": "宇傑",
+    "宇傑": "宇傑",
+    "蕭宇傑": "宇傑",
+}
+
+SHORT_TO_FULL = {
+    "子倫": "邱子倫",
+    "倫廣": "袁倫廣",
+    "才彥": "尹才彥",
+    "銘聖": "林銘聖",
+    "正宇": "楊正宇",
+    "冠宇": "蘇冠宇",
+    "宇傑": "蕭宇傑",
+}
+
+def normalize_member_name(input_name: str) -> Dict[str, Any]:
+    """
+    成員姓名自動錯字更正與標準化模組
+    自動校正同音字、錯別字，並轉換為行事曆歷史慣例之 2 字習慣稱呼與 3 字全名。
+    """
+    clean_name = (input_name or "").strip()
+    if not clean_name:
+        return {
+            "display_name": "",
+            "full_name": "",
+            "original_name": "",
+            "was_corrected": False
+        }
+
+    # 1. 字典快速精準比對 (包含全名、簡稱與已知錯字)
+    if clean_name in MEMBER_TYPO_MAP:
+        short = MEMBER_TYPO_MAP[clean_name]
+        full = SHORT_TO_FULL.get(short, short)
+        was_corrected = (clean_name != short and clean_name != full)
+        return {
+            "display_name": short,
+            "full_name": full,
+            "original_name": clean_name,
+            "was_corrected": was_corrected
+        }
+
+    # 2. 包含匹配 (例如「林銘聖同學」->「銘聖」)
+    for typo, short in MEMBER_TYPO_MAP.items():
+        if typo in clean_name:
+            full = SHORT_TO_FULL.get(short, short)
+            was_corrected = (clean_name != short and clean_name != full)
+            return {
+                "display_name": short,
+                "full_name": full,
+                "original_name": clean_name,
+                "was_corrected": was_corrected
+            }
+
+    # 3. 拼音同音/近音模糊比對 (Pinyin Matcher)
+    try:
+        from pypinyin import lazy_pinyin
+        input_pinyin = "".join(lazy_pinyin(clean_name))
+        for full, short in LAB_MEMBERS.items():
+            full_pinyin = "".join(lazy_pinyin(full))
+            short_pinyin = "".join(lazy_pinyin(short))
+            if input_pinyin == full_pinyin or input_pinyin == short_pinyin:
+                return {
+                    "display_name": short,
+                    "full_name": full,
+                    "original_name": clean_name,
+                    "was_corrected": True
+                }
+            if short_pinyin in input_pinyin or input_pinyin in short_pinyin:
+                return {
+                    "display_name": short,
+                    "full_name": full,
+                    "original_name": clean_name,
+                    "was_corrected": (clean_name != short and clean_name != full)
+                }
+    except Exception:
+        pass
+
+    # 4. 編輯距離 / 相似度模糊比對 (difflib SequenceMatcher)
+    import difflib
+    best_match = None
+    best_score = 0.0
+    for full, short in LAB_MEMBERS.items():
+        score_full = difflib.SequenceMatcher(None, clean_name, full).ratio()
+        score_short = difflib.SequenceMatcher(None, clean_name, short).ratio()
+        max_s = max(score_full, score_short)
+        if max_s > best_score:
+            best_score = max_s
+            best_match = (short, full)
+
+    if best_score >= 0.5 and best_match:
+        short, full = best_match
+        return {
+            "display_name": short,
+            "full_name": full,
+            "original_name": clean_name,
+            "was_corrected": (clean_name != short and clean_name != full)
+        }
+
+    # 若完全無法匹配，保留原名稱
+    return {
+        "display_name": clean_name,
+        "full_name": clean_name,
+        "original_name": clean_name,
+        "was_corrected": False
+    }
+
 def check_member_leave(member_name: str, target_date: Optional[datetime.date] = None) -> Dict[str, Any]:
     """
-    檢查特定成員於指定日期是否有請假紀錄
+    檢查特定成員於指定日期是否有請假紀錄（支援自動錯字更正與姓名標準化）
     """
     if target_date is None:
         target_date = datetime.date.today()
@@ -238,18 +455,27 @@ def check_member_leave(member_name: str, target_date: Optional[datetime.date] = 
     today_res = get_today_leaves(target_date)
     leaves = today_res.get("leaves", [])
 
+    norm = normalize_member_name(member_name)
+    disp_name = norm["display_name"]
+    full_name = norm["full_name"]
+    orig_name = norm["original_name"]
+
     matched_leaves = []
-    clean_name = member_name.strip()
+    search_keys = {orig_name, disp_name, full_name}
+    if len(disp_name) >= 2:
+        search_keys.add(disp_name[-2:])
 
     for l in leaves:
-        title = l["title"]
-        # 支援簡稱與全名匹配（如 倫廣 <-> 袁倫廣）
-        if clean_name in title or any(part in title for part in [clean_name[-2:], clean_name]):
+        title = l.get("title", "")
+        if any(k and k in title for k in search_keys):
             matched_leaves.append(l)
 
     return {
         "status": "success",
-        "member": member_name,
+        "member": disp_name or member_name,
+        "full_name": full_name or member_name,
+        "original_name": orig_name,
+        "was_corrected": norm["was_corrected"],
         "date": target_str,
         "is_on_leave": len(matched_leaves) > 0,
         "leave_records": matched_leaves
@@ -257,20 +483,33 @@ def check_member_leave(member_name: str, target_date: Optional[datetime.date] = 
 
 def add_leave_event(member_name: str, date_str: str, start_time: str = "10:00", end_time: str = "17:00", reason: str = "") -> Dict[str, Any]:
     """
-    自動為成員於 Google 行事曆新增請假活動（符合實驗室慣例：活動標題預設為成員姓名）
+    自動為成員於 Google 行事曆新增請假活動
+    - 自動錯字更正（如 銘璽/銘勝 -> 銘聖）
+    - 嚴格依照歷史慣例格式：活動標題一律為 2 字習慣稱呼（如 銘聖、倫廣、正宇、子倫、才彥、冠宇、宇傑）
+    - 時段預設符合實驗室在室規範：10:00 至 17:00，時區 Asia/Taipei
     """
     service = get_calendar_service()
     if not service:
         return {"status": "error", "message": "Google Calendar 服務未連線"}
 
     try:
+        norm = normalize_member_name(member_name)
+        event_title = norm["display_name"]
+        full_name = norm["full_name"]
+        was_corrected = norm["was_corrected"]
+        original = norm["original_name"]
+
         # 格式轉換: 2026-09-18T10:00:00+08:00
         start_dt = f"{date_str}T{start_time}:00+08:00"
         end_dt = f"{date_str}T{end_time}:00+08:00"
 
         clean_reason = reason.strip() if reason else ""
-        event_title = f"{member_name} {clean_reason}".strip() if clean_reason else member_name
-        desc_text = "由 IRL Lab AI 助理自動登記"
+        desc_parts = ["由 IRL Lab AI 助理自動登記"]
+        if was_corrected:
+            desc_parts.append(f"（自動更正輸入錯字：{original} ➔ {event_title}）")
+        if clean_reason:
+            desc_parts.append(f"事由: {clean_reason}")
+        desc_text = " ".join(desc_parts)
 
         event_body = {
             'summary': event_title,
@@ -286,24 +525,41 @@ def add_leave_event(member_name: str, date_str: str, start_time: str = "10:00", 
         }
 
         created_event = service.events().insert(calendarId=CALENDAR_ID, body=event_body).execute()
+
+        msg = f"已成功為 {event_title}（{full_name}）登記 {date_str} 請假行程（{start_time}～{end_time}）"
+        if was_corrected:
+            msg = f"已自動將錯字『{original}』更正為成員『{event_title}（{full_name}）』，並" + msg
+
         return {
             "status": "success",
-            "message": f"已成功為 {member_name} 登記 {date_str} 請假行程",
+            "message": msg,
             "event_id": created_event.get("id"),
-            "html_link": created_event.get("htmlLink")
+            "html_link": created_event.get("htmlLink"),
+            "display_name": event_title,
+            "full_name": full_name,
+            "was_corrected": was_corrected,
+            "original_name": original,
+            "date": date_str,
+            "period": f"{start_time} ～ {end_time}"
         }
     except Exception as e:
         return {"status": "error", "message": f"新增請假活動失敗: {str(e)}"}
 
 def cancel_leave_event(member_name: str, date_str: Optional[str] = None) -> Dict[str, Any]:
     """
-    取消特定成員於指定日期（或最近一筆）的請假活動並從 Google 日曆刪除
+    取消特定成員於指定日期（或最近一筆）的請假活動並從 Google 日曆刪除（支援自動錯字更正）
     """
     service = get_calendar_service()
     if not service:
         return {"status": "error", "message": "Google Calendar 服務未連線"}
 
     try:
+        norm = normalize_member_name(member_name)
+        disp_name = norm["display_name"]
+        full_name = norm["full_name"]
+        orig_name = norm["original_name"]
+        was_corrected = norm["was_corrected"]
+
         if date_str:
             time_min = f"{date_str}T00:00:00+08:00"
             time_max = f"{date_str}T23:59:59+08:00"
@@ -321,18 +577,22 @@ def cancel_leave_event(member_name: str, date_str: Optional[str] = None) -> Dict
             recent = get_recent_leaves(days_back=30, days_forward=90)
             leaves = recent.get("leaves", [])
 
-        clean_name = member_name.strip()
+        search_keys = {orig_name, disp_name, full_name}
+        if len(disp_name) >= 2:
+            search_keys.add(disp_name[-2:])
+
         matched = []
         for l in leaves:
             title = l.get("title", "")
-            if clean_name in title or any(part in title for part in [clean_name[-2:], clean_name]):
+            if any(k and k in title for k in search_keys):
                 matched.append(l)
 
         if not matched:
             target_desc = f"{date_str} " if date_str else ""
+            target_label = f"{disp_name}（{full_name}）" if disp_name != full_name else disp_name
             return {
                 "status": "error",
-                "message": f"未在行事曆找到 {member_name} {target_desc}的請假活動"
+                "message": f"未在行事曆找到 {target_label} {target_desc}的請假活動"
             }
 
         deleted_records = []
@@ -342,10 +602,18 @@ def cancel_leave_event(member_name: str, date_str: Optional[str] = None) -> Dict
                 service.events().delete(calendarId=CALENDAR_ID, eventId=event_id).execute()
                 deleted_records.append(m)
 
+        msg = f"已成功為 {disp_name}（{full_name}）取消 {len(deleted_records)} 筆請假行程，並已從 Google 日曆同步刪除"
+        if was_corrected:
+            msg = f"已自動將錯字『{orig_name}』更正為『{disp_name}（{full_name}）』，並" + msg
+
         return {
             "status": "success",
-            "message": f"已成功為 {member_name} 取消 {len(deleted_records)} 筆請假行程，並已從 Google 日曆同步刪除",
-            "deleted_events": deleted_records
+            "message": msg,
+            "deleted_events": deleted_records,
+            "display_name": disp_name,
+            "full_name": full_name,
+            "was_corrected": was_corrected,
+            "original_name": orig_name
         }
     except Exception as e:
         return {"status": "error", "message": f"取消請假活動失敗: {str(e)}"}

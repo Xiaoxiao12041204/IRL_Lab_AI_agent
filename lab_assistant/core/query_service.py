@@ -1027,7 +1027,44 @@ def query_leaves(keyword=""):
             res["suggestions"] = ["查詢今天誰請假", "查詢下禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣)"]
             return res
 
-        # 2. 判斷是否為「今天」、「今日」、相對日（明天、昨天）或無明確時間之問句（誰請假、有誰請假）
+        # 2. 判斷精準月份範圍 (上個月, 這個月/本月, 下個月, 或特定月份如 8月, 8月份, 2026年8月, 2026-08 等)
+        today = datetime.date.today()
+        LAST_MONTH_KW = ["上個月", "上月", "上個月份", "上月份", "前一個月", "前個月", "前月", "lastmonth", "last_month"]
+        THIS_MONTH_KW = ["這個月", "這月", "本月", "本月份", "當月", "當月份", "今月", "這個月份", "thismonth", "this_month", "currentmonth"]
+        NEXT_MONTH_KW = ["下個月", "下月", "下個月份", "下月份", "nextmonth", "next_month"]
+
+        if any(w in kw_norm for w in LAST_MONTH_KW):
+            t_year = today.year
+            t_month = today.month - 1
+            if t_month == 0:
+                t_month = 12
+                t_year -= 1
+            res = google_calendar_reader.get_month_leaves(t_year, t_month)
+            res["query_type"] = "month_range"
+            res["month_label"] = f"{t_year}年{t_month}月"
+            res["suggestions"] = ["查詢這個月請假名單", "查詢這禮拜請假名冊", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        if any(w in kw_norm for w in THIS_MONTH_KW):
+            res = google_calendar_reader.get_month_leaves(today.year, today.month)
+            res["query_type"] = "month_range"
+            res["month_label"] = f"{today.year}年{today.month}月"
+            res["suggestions"] = ["查詢這禮拜請假名冊", "查詢今天誰請假", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        if any(w in kw_norm for w in NEXT_MONTH_KW):
+            t_year = today.year
+            t_month = today.month + 1
+            if t_month > 12:
+                t_month = 1
+                t_year += 1
+            res = google_calendar_reader.get_month_leaves(t_year, t_month)
+            res["query_type"] = "month_range"
+            res["month_label"] = f"{t_year}年{t_month}月"
+            res["suggestions"] = ["查詢這個月請假名單", "查詢這禮拜請假名冊", "查詢特定成員請假狀態 (如：袁倫廣)"]
+            return res
+
+        # 3. 判斷是否為「今天」、「今日」、相對日（明天、昨天）或無明確時間之問句（誰請假、有誰請假）
         if not raw_kw or kw_norm in ("今天", "今日", "today", "現在", "目前", "誰請假", "有誰請假", "誰有請假", "誰", "who"):
             res = google_calendar_reader.get_today_leaves()
             res["query_type"] = "today"
@@ -1048,7 +1085,7 @@ def query_leaves(keyword=""):
             res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢實驗室出勤規定"]
             return res
 
-        # 3. 判斷是否為完整特定年月日 (例如 2026-09-14, 2026/09/14, 9-14, 9/14, 9月14日)
+        # 4. 判斷是否為完整特定年月日 (例如 2026-09-14, 2026/09/14, 9-14, 9/14, 9月14日)
         m_full_date = re.search(r'(?:(\d{4})[-/年])?(\d{1,2})[-/月](\d{1,2})日?', raw_kw)
         if m_full_date:
             year = int(m_full_date.group(1)) if m_full_date.group(1) else datetime.date.today().year
@@ -1063,46 +1100,50 @@ def query_leaves(keyword=""):
             except Exception:
                 pass
 
-        # 4. 判斷是否為「月份」格式 (例如 2026-09, 2026/09, 2026年9月, 9月)
-        m_month = re.search(r'^(?:(\d{4})[-/年])?(\d{1,2})月?$', raw_kw)
-        if m_month:
-            year = int(m_month.group(1)) if m_month.group(1) else datetime.date.today().year
-            month = int(m_month.group(2))
-            if 1 <= month <= 12:
-                res = google_calendar_reader.get_month_leaves(year, month)
+        # 5. 判斷是否為明確指定月份 (例如 2026-08, 2026/08, 2026年8月, 8月份, 8月, 八月, 8月呢, 8月請假)
+        CN_MONTH_MAP = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10, "十一": 11, "十二": 12}
+        m_month_spec = re.search(r'(?:(\d{4})[-/年\.\s]*)?(\d{1,2}|[一二三四五六七八九十]{1,2})月(?:份)?', raw_kw)
+        if not m_month_spec:
+            m_month_spec = re.search(r'(\d{4})[-/](\d{1,2})(?![-/\d])', raw_kw)
+
+        if m_month_spec:
+            year_val = int(m_month_spec.group(1)) if m_month_spec.group(1) else today.year
+            raw_m = m_month_spec.group(2)
+            month_val = CN_MONTH_MAP.get(raw_m) if raw_m in CN_MONTH_MAP else int(raw_m) if raw_m.isdigit() else None
+            if month_val and 1 <= month_val <= 12:
+                res = google_calendar_reader.get_month_leaves(year_val, month_val)
                 res["query_type"] = "month_range"
+                res["month_label"] = f"{year_val}年{month_val}月"
                 res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢實驗室出勤規定"]
                 return res
 
-        # 5. 成員比對：只有命中真實成員名冊時才進入 member_check
-        KNOWN_MEMBERS = ["邱子倫", "子倫", "袁倫廣", "倫廣", "尹才彥", "才彥", "林銘聖", "銘聖", "楊正宇", "正宇", "蘇冠宇", "冠宇", "蕭宇傑", "宇傑"]
+        # 6. 成員比對：支援自動錯字更正與姓名標準化 (例如 銘璽/銘勝 -> 銘聖, 政宇 -> 正宇)
+        norm_mem = google_calendar_reader.normalize_member_name(raw_kw)
         target_member = None
-        for m in KNOWN_MEMBERS:
-            if m in raw_kw:
-                target_member = m
-                break
-
-        if not target_member:
+        if norm_mem.get("display_name") and norm_mem.get("display_name") in google_calendar_reader.LAB_MEMBERS.values():
+            target_member = norm_mem.get("display_name")
+        else:
             clean_name = raw_kw
             for noise in ["有沒有請假", "請假了嗎", "請假名單", "請假名冊", "請假紀錄", "請假記錄", "有請假嗎", "請假", "查詢", "請問", "想問", "查一下"]:
                 clean_name = clean_name.replace(noise, "")
             clean_name = clean_name.strip()
-            if clean_name in KNOWN_MEMBERS:
-                target_member = clean_name
+            norm_clean = google_calendar_reader.normalize_member_name(clean_name)
+            if norm_clean.get("display_name") and norm_clean.get("display_name") in google_calendar_reader.LAB_MEMBERS.values():
+                target_member = norm_clean.get("display_name")
 
         if target_member:
             res = google_calendar_reader.check_member_leave(target_member)
             recent = google_calendar_reader.get_recent_leaves(days_back=14, days_forward=14)
             member_history = [
                 l for l in recent.get("leaves", []) 
-                if target_member in l["title"] or any(part in l["title"] for part in [target_member[-2:], target_member])
+                if target_member in l.get("title", "") or any(part in l.get("title", "") for part in [target_member[-2:], target_member])
             ]
             res["query_type"] = "member_check"
             res["history_leaves"] = member_history
             res["suggestions"] = ["查詢今天全體請假名單", "查詢這禮拜請假名冊", f"查詢 {target_member} 保管之設備清冊"]
             return res
 
-        # 6. 廣義近期名冊查詢 fallback (近兩週~一個月)
+        # 7. 廣義近期名冊查詢 fallback (近兩週~一個月)
         res = google_calendar_reader.get_recent_leaves(days_back=14, days_forward=14)
         res["query_type"] = "recent_range"
         res["suggestions"] = ["查詢今天誰請假", "查詢這禮拜請假名單", "查詢特定成員請假狀態 (如：袁倫廣)"]
@@ -1111,9 +1152,11 @@ def query_leaves(keyword=""):
     except Exception as e:
         return {"status": "error", "message": f"連線至 Google 日曆失敗: {e}", "suggestions": ["查詢實驗室請假規則與懲處標準"]}
 
+query_leave = query_leaves
+
 def apply_leave(member_name, date_str="今天", start_time="10:00", end_time="17:00", reason=""):
     """
-    透過 AI 自動登記請假至 Google 行事曆（標題預設為姓名，符合實驗室慣例）
+    透過 AI 自動登記請假至 Google 行事曆（自動校正錯字，嚴格遵循歷史慣例格式：標題為兩字習慣稱呼，時段預設 10:00~17:00）
     """
     try:
         import google_calendar_reader
@@ -1151,20 +1194,24 @@ def apply_leave(member_name, date_str="今天", start_time="10:00", end_time="17
         )
 
         if res.get("status") == "success":
+            disp = res.get("display_name", member_name)
             res["details"] = {
-                "member": member_name,
+                "original_input": res.get("original_name", member_name),
+                "member": disp,
+                "full_name": res.get("full_name", member_name),
+                "was_corrected": res.get("was_corrected", False),
                 "date": target_date_str,
                 "period": f"{start_time} ～ {end_time}",
                 "reason": reason if reason else "未特別註明"
             }
-            res["suggestions"] = ["查詢今天誰請假", f"查詢 {member_name} 近期請假紀錄", "查詢實驗室請假規則"]
+            res["suggestions"] = ["查詢今天誰請假", f"查詢 {disp} 近期請假紀錄", "查詢實驗室請假規則"]
         return res
     except Exception as e:
         return {"status": "error", "message": f"自動登記請假失敗: {e}"}
 
 def cancel_leave(member_name, date_str=None):
     """
-    透過 AI 取消指定成員的請假紀錄並同步自 Google 日曆刪除
+    透過 AI 取消指定成員的請假紀錄並同步自 Google 日曆刪除（支援自動錯字更正）
     """
     try:
         import google_calendar_reader
@@ -1190,7 +1237,8 @@ def cancel_leave(member_name, date_str=None):
                     clean_date = f"{y:04d}-{m_val:02d}-{d_val:02d}"
 
         res = google_calendar_reader.cancel_leave_event(member_name=member_name, date_str=clean_date)
-        res["suggestions"] = ["查詢今天誰請假", f"查詢 {member_name} 近期請假紀錄", "查詢實驗室出勤規定"]
+        disp = res.get("display_name", member_name)
+        res["suggestions"] = ["查詢今天誰請假", f"查詢 {disp} 近期請假紀錄", "查詢實驗室出勤規定"]
         return res
     except Exception as e:
         return {"status": "error", "message": f"取消請假失敗: {e}"}
