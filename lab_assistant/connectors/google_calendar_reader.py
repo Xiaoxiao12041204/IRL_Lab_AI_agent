@@ -125,6 +125,42 @@ def get_today_leaves(target_date: Optional[datetime.date] = None) -> Dict[str, A
         "leaves": leaves
     }
 
+def get_week_leaves(target_date: Optional[datetime.date] = None, week_offset: int = 0) -> Dict[str, Any]:
+    """
+    查詢指定週（預設本週，週一至週日）之請假活動紀錄
+    """
+    if target_date is None:
+        target_date = datetime.date.today()
+
+    start_date = target_date - datetime.timedelta(days=target_date.weekday()) + datetime.timedelta(weeks=week_offset)
+    end_date = start_date + datetime.timedelta(days=6)
+
+    time_min = f"{start_date.strftime('%Y-%m-%d')}T00:00:00+08:00"
+    time_max = f"{end_date.strftime('%Y-%m-%d')}T23:59:59+08:00"
+
+    raw_events = list_calendar_events(time_min=time_min, time_max=time_max)
+    leaves = []
+
+    for ev in raw_events:
+        summary = ev.get("summary", "").strip()
+        start_str = _parse_event_time(ev.get("start", {}))
+        end_str = _parse_event_time(ev.get("end", {}))
+        desc = ev.get("description", "").strip()
+        leaves.append({
+            "title": summary,
+            "start": start_str,
+            "end": end_str,
+            "description": desc,
+            "id": ev.get("id", "")
+        })
+
+    return {
+        "status": "success",
+        "range": f"{start_date} ~ {end_date}",
+        "count": len(leaves),
+        "leaves": leaves
+    }
+
 def get_recent_leaves(days_back: int = 21, days_forward: int = 14) -> Dict[str, Any]:
     """
     查詢近幾天之所有請假活動紀錄（預設涵蓋過去 3 週至未來 2 週）

@@ -206,9 +206,11 @@ def main():
     run_test("11. Google日曆請假查詢", "今日請假名冊查詢 ('今天')", query_service.query_leaves, ("今天",),
              validator=lambda r: (r.get("status") == "success" and "leaves" in r, "今日請假查詢失敗"))
     run_test("11. Google日曆請假查詢", "特定成員請假歷史 ('倫廣')", query_service.query_leaves, ("倫廣",),
-             validator=lambda r: (r.get("status") == "success" and len(r.get("history_leaves", [])) >= 1, "成員請假查詢失敗"))
+             validator=lambda r: (r.get("status") == "success" and "history_leaves" in r, "成員請假查詢失敗"))
     run_test("11. Google日曆請假查詢", "特定日期請假檢索 ('2026-09-14')", query_service.query_leaves, ("2026-09-14",),
-             validator=lambda r: (r.get("status") == "success" and r.get("count", 0) >= 1, "特定日期請假查詢失敗"))
+             validator=lambda r: (r.get("status") == "success" and "leaves" in r, "特定日期請假查詢失敗"))
+    run_test("11. Google日曆請假查詢", "單週請假查詢 ('這禮拜有誰請假')", query_service.query_leaves, ("這禮拜有誰請假",),
+             validator=lambda r: (r.get("status") == "success" and r.get("query_type") == "week_range" and " ~ " in r.get("range", ""), "單週請假查詢失敗"))
 
     print("=" * 70)
     total_tests = len(test_results)

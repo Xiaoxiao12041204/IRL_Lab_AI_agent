@@ -1,6 +1,26 @@
 ================================================================================
 YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - ChangeLog
-================================================================================
+===============================================================================
+
+[2026-09-24] - 精準單週請假查詢修復與 OpenClaw 實體檔部署升級 (Precise Weekly Leave Query & Physical Workspace Copy)
+- 調整與修復項目：
+  * **【單週與相對日期請假查詢修復】**：
+    - 修復詢問「這禮拜有誰請假」時，`query_service.py` 誤套用廣義範圍 `get_recent_leaves(days_back=21, days_forward=14)` 導致回傳長達 35 天（2026-09-03 ~ 2026-10-08）日期範圍之缺陷。
+    - 於 `google_calendar_reader.py` 新增 `get_week_leaves(week_offset=0)` 函式，精準計算當週星期一至星期日（如 2026-09-21 ~ 2026-09-27）。
+    - 於 `query_service.py` 補全 `這禮拜`、`本週`、`下禮拜`、`上禮拜`、`明天`、`昨天` 等相對日期比對優先權，輸出 100% 精準對齊日曆之週範圍。
+  * **【OpenClaw 安全沙箱 Symlink 阻擋修復】**：
+    - 修復 OpenClaw 沙箱拒絕 Symlink 設定檔（`reason: symlink path component not allowed`）導致歡迎語回退與工作區面板顯示 Missing 之問題。
+    - 升級 `openclaw_setup/deploy.sh` 與工作區管理邏輯，將 `AGENTS.md`、`SOUL.md`、`IDENTITY.md`、`USER.md` 改以 `cp` 實體檔案複製同步至 `/home/openclaw/.openclaw/agents/main/workspace`。
+  * **【端到端測試與驗證】**：
+    - `comprehensive_test_suite.py` 擴充單週請假檢索測試，35 項整合測試 100% PASS。
+
+[2026-09-24] - WSL2 systemd-logind 使用者會話釋放與頻繁斷線修復 (systemd Logind Session Timeout Repair)
+- 調整與修復項目：
+  * **【原因診斷】**：
+    - 發現 OpenClaw 重開機或執行 WSL 命令後頻繁斷線重新連線，係因 `systemd-logind` 預設在使用者 PAM 會話關閉 10 秒後（`UserStopDelaySec=10`）自動終止 `user@1000.service` 使用者進程，導致背景 `openclaw-gateway.service` 不斷被 SIGTERM 終止。
+  * **【logind 覆寫設定與防斷線機制】**：
+    - 於 WSL 中建立 `/etc/systemd/logind.conf.d/override.conf`，寫入 `KillUserProcesses=no` 與 `UserStopDelaySec=infinity`。
+    - 搭配 Windows 本機 `%USERPROFILE%\.wslconfig` (`vmIdleTimeout=-1`) 與 `loginctl enable-linger openclaw`，徹底解決 Windows Companion 頻繁斷線問題。
 
 [2026-09-23] - 清除外層冗餘重複檔案與目錄樹最佳化 (Deduplication of Root Level Setup Files)
 - 調整與維護項目：

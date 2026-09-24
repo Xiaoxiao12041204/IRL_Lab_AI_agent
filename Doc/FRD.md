@@ -27,7 +27,7 @@
     - 🖥️ **設備財產清冊與使用中成員** (`lab_properties.json`)：結構化 JSON 管理，支援完整財產清冊查詢；現役成員名單自動動態萃取自使用中設備清冊，輸出時回歸純粹成員名冊格式（僅列姓名與研究室，不附帶主機規格與 IP 地址）。
     - 🎓 **歷屆校友資料庫** (`lab_alumni.json`)：維持結構化 JSON，支援姓名、系所、專長領域與畢業年份完整檢索。
     - 💰 **公用經費與計畫帳本**：**改為直接連線 MediaWiki 知識庫 (`wiki_reader.py`) 檢索**（取得線上「公用經費清單」頁面與 Google 試算表 `1un-VyqNpeIMiQvHZSW51Koo7_WZI-XwQdxs_mTc7O2w/#gid=9`，並整合線上報帳與經費規章，本地帳本 `lab_funds_ledger.json` 作為結構化補充明細；收支清冊輸出嚴格依日期先後遞進由舊至新排序，使結餘演變符合時間流水帳邏輯）。
-    - 📅 **Google Calendar 實驗室行事曆請假出勤連動、自動登記與取消** (`google_calendar_reader.py`)：透過 Google Calendar REST API 直連官方日曆，即時判斷今日請假成員、請假時段、特定成員歷史紀錄與特定日期請假名冊；支援成員透過 AI 自然語言登記請假與取消請假，自動同步建立或刪除日曆行程，輔助查核實驗室出勤規定。
+    - 📅 **Google Calendar 實驗室行事曆請假出勤連動、自動登記與取消** (`google_calendar_reader.py`)：透過 Google Calendar REST API 直連官方日曆，即時判斷今日請假成員、請假時段、特定成員歷史紀錄、特定日期請假名冊與精準當週/單週（這禮拜/本週/下週/上週）請假範圍（`get_week_leaves`）；支援成員透過 AI 自然語言登記請假與取消請假，自動同步建立或刪除日曆行程，輔助查核實驗室出勤規定。
     - 📜 **會計報銷與請假規章** (`accounting_rules.json` & `wiki_knowledge.json`)：支援請假規則與報帳規章（發票、便當、估價單、差旅、兼任薪資、Portal報帳與採購單建立流程）之精準分流與 `formatted_response` 格式化輸出；**操作流程與長篇條款全面禁止使用 Markdown 表格包裝，一律採用三級標題與符號清單垂直展開，徹底杜絕 `<br>` 標籤外露與窄螢幕破版擠壓**。
   - **多關鍵字複合分詞檢索 (Multi-keyword Token Search)**：設備使用者、校友、論文、財產、帳本、法規全面支援空格分詞 (AND) 複合查詢。
   - **通用類別詞正規化過濾 (Category Meta-Keyword Normalizer)**：內建大類別名詞（校友名冊、設備清冊、現役成員、歷屆論文等）自動識別機制，若查詢詞為大類別總稱則自動回傳全體完整清冊；若包含複合條件則精準剝除類別修飾詞後執行核心檢索。
@@ -72,6 +72,12 @@
   - **模糊比對與多分詞搜尋**：論文檢索暖機後需維持在 `< 10 ms`。
   - **跨庫聯查 (360° 全景速查)**：涵蓋論文、財產、經費與官網資料，需在 `< 15 ms` 內整合完畢。
   - **外網連線降級保證**：遇外網或遠端 NAS/Wiki/官網延遲時，優先讀取本地結構化快取，確保對話不阻斷。
+
+### 2.3 WSL2 Systemd 常駐與 logind 會話保護規格
+- **systemd-logind 會話過期與搶佔防護**：
+  - 於 `/etc/systemd/logind.conf.d/override.conf` 設定 `KillUserProcesses=no` 與 `UserStopDelaySec=infinity`，停用系統於 PAM 會話登出 10 秒後自動終止 `user@1000.service` 之預設行為。
+- **背景長效 linger 機制**：
+  - 開啟 `loginctl enable-linger openclaw`，保障 openclaw 使用者之 systemd 服務全時段常駐，解決 OpenClaw Companion 反覆自動中斷連線與重新連線之問題。
 
 
 

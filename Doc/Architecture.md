@@ -38,7 +38,7 @@
             │     │
             │     ├── Google Calendar 實驗室行事曆連動引擎 (google_calendar_reader.py)
             │     │     ➔ 串接 Google Calendar REST API (Service Account)
-            │     │     ➔ 📅【成員請假與出勤】即時查詢今日請假、近期名冊、特定日期與時段，支援 AI 自然語言登記寫入與取消刪除
+            │     │     ➔ 📅【成員請假與出勤】即時查詢今日請假、近期名冊、特定日期與時段，精準單週（這禮拜/本週/下週/上週）範圍（get_week_leaves），支援 AI 自然語言登記寫入與取消刪除
             │     │
             │     ├── Google Sheets 雲端即時雙向記帳引擎 (sheets_writer.py)
             │     │     ➔ 串接 Google Sheets REST API (Service Account 授權憑證)
@@ -119,3 +119,7 @@ IRL_Lab_AI_agent/
 - **實驗室知識庫 (`query_service.py`)**：結構化管理校友、財產、經費與法規，支援快速精準檢索；新增 **360 度跨庫全景聯查**、**情境式報帳合規防呆試算顧問** 與 **主動式智慧延伸推薦 (Follow-up)**。
 - **MediaWiki 實驗室維基百科整合 (`wiki_reader.py`)**：串接 `https://yzuirl.synology.me/mediawiki/`，提供請假、報帳期程、外籍/約用助理、境外電商統編與畢業離校規範之即時檢索與章節級精準定位。
 - **資料庫自動同步機制**：隨時保持本地 7 大 JSON 資料庫與線上 Wiki / NAS 之 100% 資料一致性。
+
+### 3.3 WSL2 systemd-logind 會話保護與長效常駐架構
+- **Logind 終止保護**：配置 `/etc/systemd/logind.conf.d/override.conf` (`KillUserProcesses=no` 及 `UserStopDelaySec=infinity`)，避免每次執行一次性 `wsl` 命令離線後系統主動發送 SIGTERM 關閉 `openclaw-gateway.service`。
+- **端對端 24/7 安定運行**：配合 `loginctl enable-linger openclaw` 與 Windows `%USERPROFILE%\.wslconfig` (`vmIdleTimeout=-1`)，實現連線 100% 穩定常駐。

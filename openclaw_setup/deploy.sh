@@ -9,6 +9,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 WORKSPACE="/home/openclaw/.openclaw/workspace"
+MAIN_WORKSPACE="/home/openclaw/.openclaw/agents/main/workspace"
 INSTALL_DIR="/home/openclaw/irl_lab"
 
 echo "============================================"
@@ -16,7 +17,7 @@ echo "🧪 IRL Lab AI Agent → OpenClaw 部署"
 echo "============================================"
 echo "專案來源: $PROJECT_ROOT"
 echo "安裝目標: $INSTALL_DIR"
-echo "OpenClaw 工作區: $WORKSPACE"
+echo "OpenClaw 工作區: $WORKSPACE 及 $MAIN_WORKSPACE"
 echo ""
 
 # ── 步驟 1：建立安裝目錄 ────────────────────────────
@@ -59,29 +60,19 @@ deactivate
 # ── 步驟 4：部署 OpenClaw 工作區設定檔 ───────────────
 echo "⚙️  步驟 4/5：部署 OpenClaw 工作區設定檔..."
 mkdir -p "$WORKSPACE/memory"
+mkdir -p "$MAIN_WORKSPACE/memory"
 
-# 備份現有設定
-BACKUP_DIR="$WORKSPACE/.backup_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "$BACKUP_DIR"
-for f in AGENTS.md IDENTITY.md SOUL.md USER.md; do
-    if [ -f "$WORKSPACE/$f" ]; then
-        cp "$WORKSPACE/$f" "$BACKUP_DIR/$f"
-        echo "   備份: $f → $BACKUP_DIR/"
+# 複製 IRL Lab 設定檔到工作區 (使用 cp 實體檔案，禁止 symlink 以防 OpenClaw 沙箱擋住)
+for target in "$WORKSPACE" "$MAIN_WORKSPACE"; do
+    cp "$SCRIPT_DIR/AGENTS.md"   "$target/AGENTS.md"
+    cp "$SCRIPT_DIR/IDENTITY.md" "$target/IDENTITY.md"
+    cp "$SCRIPT_DIR/SOUL.md"     "$target/SOUL.md"
+    cp "$SCRIPT_DIR/USER.md"     "$target/USER.md"
+    if [ -f "$target/BOOTSTRAP.md" ]; then
+        rm "$target/BOOTSTRAP.md"
     fi
 done
-
-# 複製 IRL Lab 設定檔到工作區
-cp "$SCRIPT_DIR/AGENTS.md"   "$WORKSPACE/AGENTS.md"
-cp "$SCRIPT_DIR/IDENTITY.md" "$WORKSPACE/IDENTITY.md"
-cp "$SCRIPT_DIR/SOUL.md"     "$WORKSPACE/SOUL.md"
-cp "$SCRIPT_DIR/USER.md"     "$WORKSPACE/USER.md"
-echo "   ✓ 工作區設定檔部署完成"
-
-# 刪除 BOOTSTRAP.md（避免 OpenClaw 重新初始化）
-if [ -f "$WORKSPACE/BOOTSTRAP.md" ]; then
-    rm "$WORKSPACE/BOOTSTRAP.md"
-    echo "   ✓ BOOTSTRAP.md 已移除（防止重複初始化）"
-fi
+echo "   ✓ 工作區設定檔 (無 symlink) 部署完成"
 
 # ── 步驟 5：驗證部署 ─────────────────────────────────
 echo "✅ 步驟 5/5：驗證部署..."
