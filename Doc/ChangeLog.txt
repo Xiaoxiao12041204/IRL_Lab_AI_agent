@@ -11,6 +11,9 @@ YZU 会計報帳小幫手 & 實驗室 AI 助理 (IRL Lab AI Agent Platform) - Ch
   * **【OpenClaw 安全沙箱 Symlink 阻擋修復】**：
     - 修復 OpenClaw 沙箱拒絕 Symlink 設定檔（`reason: symlink path component not allowed`）導致歡迎語回退與工作區面板顯示 Missing 之問題。
     - 升級 `openclaw_setup/deploy.sh` 與工作區管理邏輯，將 `AGENTS.md`、`SOUL.md`、`IDENTITY.md`、`USER.md` 改以 `cp` 實體檔案複製同步至 `/home/openclaw/.openclaw/agents/main/workspace`。
+  * **【Google Calendar 雲端套件依賴補齊與即時連線修復】**：
+    - 發現 WSL 系統 Python 缺少 `google-api-python-client`、`google-auth` 等必要套件，導致 Google Calendar API 初始化靜默失敗（輸出 `No module named 'google'`）並誤判出勤人數為 0。
+    - 於 WSL 完整安裝依賴套件並實測連線，成功精準抓取 Google 行事曆上本週（9/21 倫廣、9/22 倫廣、9/24 倫廣）共 3 筆真實請假資料。
   * **【端到端測試與驗證】**：
     - `comprehensive_test_suite.py` 擴充單週請假檢索測試，35 項整合測試 100% PASS。
 
